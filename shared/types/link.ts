@@ -1,0 +1,56 @@
+import { z } from "zod";
+
+export const LinkStatusSchema = z.enum(["active", "inactive", "expired"]);
+
+export const LinkSchema = z.object({
+  id: z.uuid(),
+  shortCode: z.string().min(1).max(50),
+  originalUrl: z.url(),
+  userId: z.uuid().nullable(),
+  organizationId: z.uuid().nullable(),
+  title: z.string().max(200).nullable(),
+  description: z.string().max(500).nullable(),
+  status: LinkStatusSchema.default("active"),
+  expiresAt: z.coerce.date().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const CreateLinkSchema = LinkSchema.pick({
+  originalUrl: true,
+  organizationId: true,
+  title: true,
+  description: true,
+  expiresAt: true,
+}).partial({
+  organizationId: true,
+  title: true,
+  description: true,
+  expiresAt: true,
+});
+
+export const UpdateLinkSchema = LinkSchema.pick({
+  originalUrl: true,
+  title: true,
+  description: true,
+  status: true,
+  expiresAt: true,
+}).partial();
+
+export const LinkQuerySchema = z.object({
+  linkId: z.uuid().optional(),
+  organizationId: z.uuid().optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+  status: LinkStatusSchema.optional(),
+});
+
+export const UpdateLinkBodySchema = UpdateLinkSchema.extend({
+  linkId: z.uuid().meta({ description: "The ID of the link to update" }),
+});
+
+export type Link = z.infer<typeof LinkSchema>;
+export type CreateLink = z.infer<typeof CreateLinkSchema>;
+export type UpdateLink = z.infer<typeof UpdateLinkSchema>;
+export type LinkStatus = z.infer<typeof LinkStatusSchema>;
+export type UpdateLinkBody = z.infer<typeof UpdateLinkBodySchema>;

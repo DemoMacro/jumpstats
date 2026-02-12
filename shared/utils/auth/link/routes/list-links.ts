@@ -1,0 +1,80 @@
+import { createAuthEndpoint, APIError } from "better-auth/api";
+import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
+import { LinkQuerySchema, type Link } from "../../../../types/link";
+import { buildLinkWhereConditions } from "../permissions";
+
+export const listLinks = () => {
+  return createAuthEndpoint(
+    "/link/list",
+    {
+      method: "GET",
+      query: LinkQuerySchema,
+      use: [sessionMiddleware],
+      metadata: {
+        openapi: {
+          description: "List links for the current user",
+          responses: {
+            "200": {
+              description: "Links retrieved successfully",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (ctx) => {
+      const session = await getSessionFromCtx(ctx);
+      if (!session) {
+        throw new APIError("UNAUTHORIZED", {
+          message: "Authentication required",
+        });
+      }
+
+      const organizationId = ctx.query?.organizationId;
+      const limit = ctx.query?.limit ?? 20;
+      const offset = ctx.query?.offset ?? 0;
+      const status = ctx.query?.status;
+
+      // Build where conditions based on user role
+      const whereConditions = await buildLinkWhereConditions({
+        userId: session.user.id,
+        userRole: session.user.role,
+        organizationId,
+        status,
+        adapter: ctx.context.adapter,
+      });
+
+      // Fetch links with pagination
+      const links = await ctx.context.adapter.findMany<Link>({
+        model: "link",
+        where: whereConditions,
+        limit,
+        offset,
+        sortBy: {
+          field: "createdAt",
+          direction: "desc",
+        },
+      });
+
+      // Get total count
+      const total = await ctx.context.adapter.count({
+        model: "link",
+        where: whereConditions,
+      });
+
+      return ctx.json({
+        links,
+        total,
+      });
+    },
+  );
+};

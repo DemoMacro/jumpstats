@@ -1,0 +1,126 @@
+<script setup lang="ts">
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
+
+const toast = useToast();
+
+definePageMeta({
+  title: "Sign In - JumpStats",
+});
+
+const fields: AuthFormField[] = [
+  {
+    name: "identifier",
+    type: "text",
+    label: "Email or Username",
+    required: true,
+  },
+  {
+    name: "password",
+    label: "Password",
+    type: "password",
+    required: true,
+  },
+  {
+    name: "rememberMe",
+    label: "Remember me",
+    type: "checkbox",
+  },
+];
+
+const schema = z.object({
+  identifier: z.string().min(1, "Email or username is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().optional(),
+});
+
+type Schema = z.output<typeof schema>;
+
+const loading = ref(false);
+
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+  loading.value = true;
+  try {
+    const { $authClient } = useNuxtApp();
+
+    // Check if identifier is email or username
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.data.identifier);
+
+    let result;
+    if (isEmail) {
+      result = await $authClient.signIn.email({
+        email: payload.data.identifier,
+        password: payload.data.password,
+        rememberMe: payload.data.rememberMe,
+        callbackURL: "/dashboard",
+      });
+    } else {
+      result = await $authClient.signIn.username({
+        username: payload.data.identifier,
+        password: payload.data.password,
+        rememberMe: payload.data.rememberMe,
+        callbackURL: "/dashboard",
+      });
+    }
+
+    if (result.error) {
+      console.log(result.error);
+      toast.add({
+        title: "Sign In Error",
+        description: result.error.message || "Invalid credentials",
+        color: "error",
+      });
+      return;
+    }
+
+    toast.add({
+      title: "Welcome Back!",
+      description: "Successfully signed in",
+      color: "success",
+    });
+  } catch (error) {
+    toast.add({
+      title: "Sign In Error",
+      description: "An unexpected error occurred",
+      color: "error",
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
+
+<template>
+  <div class="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <UPageCard class="w-full max-w-md">
+      <UAuthForm
+        :schema="schema"
+        title="Sign In"
+        description="Enter your credentials to access your account"
+        icon="i-lucide-user"
+        :fields="fields"
+        :submit="{
+          label: 'Sign In',
+          loading,
+          block: true,
+        }"
+        @submit="onSubmit"
+      >
+        <template #description>
+          Don't have an account?
+          <ULink to="/auth/sign-up" class="text-primary font-medium"> Sign up </ULink>.
+        </template>
+
+        <template #password-hint>
+          <ULink to="/auth/forgot-password" class="text-primary font-medium">
+            Forgot password?
+          </ULink>
+        </template>
+
+        <template #validation>
+          <div id="error-message" />
+        </template>
+      </UAuthForm>
+    </UPageCard>
+  </div>
+</template>
