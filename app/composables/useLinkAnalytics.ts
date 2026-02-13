@@ -1,4 +1,5 @@
 type DimensionTab = "devices" | "browsers" | "referers" | "utm";
+type TimeGranularity = "hour" | "day" | "week" | "month";
 
 interface Range {
   start: Date;
@@ -6,8 +7,8 @@ interface Range {
 }
 
 type TimeseriesData = {
-  timestamp: string;
-  clicks: string;
+  timestamp: Date;
+  clicks: string | number;
 };
 
 type DimensionData = {
@@ -26,6 +27,7 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
       end: new Date(),
     });
   const activeTab = ref<DimensionTab>("devices");
+  const timeGranularity = ref<TimeGranularity>("hour");
 
   // Data refs
   const timeseries = ref<TimeseriesData[]>([]);
@@ -143,35 +145,116 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
     { immediate: true },
   );
 
+  // Auto-adjust time granularity based on data volume (each data point = 1 hour)
+  watch(
+    timeseries,
+    (data) => {
+      const dataPointCount = data.length; // Each data point represents 1 hour
+      const rangeHours = dataPointCount;
+      const rangeDays = rangeHours / 24;
+
+      let suggestedGranularity: TimeGranularity = "hour";
+
+      if (rangeHours <= 24) {
+        suggestedGranularity = "hour";
+      } else if (rangeDays <= 30) {
+        suggestedGranularity = "day";
+      } else if (rangeDays <= 180) {
+        suggestedGranularity = "week";
+      } else {
+        suggestedGranularity = "month";
+      }
+
+      timeGranularity.value = suggestedGranularity;
+    },
+    { immediate: true },
+  );
+
   const chartData = computed(() => {
-    return timeseries.value.map((d) => {
-      // Parse ClickHouse datetime format: 'YYYY-MM-DD HH:mm:ss'
-      if (!d.timestamp) {
-        return { date: new Date(), amount: Number(d.clicks ?? 0) };
-      }
+    if (timeseries.value.length === 0) return [];
 
-      const parts = d.timestamp.split(" ");
-      if (parts.length !== 2) {
-        return { date: new Date(), amount: Number(d.clicks ?? 0) };
-      }
-
-      const datePart = parts[0] ?? "";
-      const timePart = parts[1] ?? "";
-      const dateNumbers = datePart.split("-").map(Number);
-      const timeNumbers = timePart.split(":").map(Number);
-
-      if (dateNumbers.length !== 3 || timeNumbers.length !== 3) {
-        return { date: new Date(), amount: Number(d.clicks ?? 0) };
-      }
-
-      const [year = 0, month = 1, day = 1] = dateNumbers;
-      const [hour = 0, minute = 0, second = 0] = timeNumbers;
-
+    // Get hourly data from backend
+    const hourlyData = timeseries.value.map((d) => {
+      // Convert timestamp to string and append 'Z' for UTC parsing
+      const timestampStr = String(d.timestamp);
+      const date = new Date(timestampStr + "Z");
       return {
-        date: new Date(year, month - 1, day, hour, minute, second),
+        date,
         amount: Number(d.clicks ?? 0),
       };
     });
+
+    const granularity = timeGranularity.value;
+
+    // Return hourly data directly (no aggregation needed)
+    if (granularity === "hour") {
+      return hourlyData;
+    }
+
+    // Aggregate by day
+    if (granularity === "day") {
+      const grouped = new Map<string, number>();
+
+      for (const item of hourlyData) {
+        // Use date string as key (YYYY-MM-DD)
+        const key = item.date.toISOString().split("T")[0] ?? "";
+        grouped.set(key, (grouped.get(key) ?? 0) + item.amount);
+      }
+
+      return Array.from(grouped.entries())
+        .map(([dateStr, amount]) => ({
+          date: new Date(`${dateStr}T00:00:00Z`),
+          amount,
+        }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+    }
+
+    // Aggregate by week
+    if (granularity === "week") {
+      const grouped = new Map<string, number>();
+
+      for (const item of hourlyData) {
+        const date = item.date;
+        // Get start of week (Sunday)
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+
+        const key = weekStart.toISOString().split("T")[0] ?? "";
+        grouped.set(key, (grouped.get(key) ?? 0) + item.amount);
+      }
+
+      return Array.from(grouped.entries())
+        .map(([dateStr, amount]) => ({
+          date: new Date(`${dateStr}T00:00:00Z`),
+          amount,
+        }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+    }
+
+    // Aggregate by month
+    if (granularity === "month") {
+      const grouped = new Map<string, number>();
+
+      for (const item of hourlyData) {
+        const date = item.date;
+        // Use YYYY-MM as key
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        grouped.set(key, (grouped.get(key) ?? 0) + item.amount);
+      }
+
+      return Array.from(grouped.entries())
+        .map(([dateStr, amount]) => {
+          const [year, month] = dateStr.split("-");
+          return {
+            date: new Date(`${year}-${month}-01T00:00:00Z`),
+            amount,
+          };
+        })
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+    }
+
+    return hourlyData;
   });
 
   const mobilePercentage = computed(() => {
@@ -225,9 +308,14 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
     activeTab.value = tab;
   }
 
+  function setTimeGranularity(granularity: TimeGranularity) {
+    timeGranularity.value = granularity;
+  }
+
   return {
     range,
     activeTab,
+    timeGranularity,
     timeseries,
     countries,
     devices,
@@ -245,5 +333,6 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
     error,
     fetchAllData,
     setTab,
+    setTimeGranularity,
   };
 }

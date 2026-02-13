@@ -70,9 +70,11 @@ const selectRange = (range: { days?: number; months?: number; years?: number }) 
     startDate = startDate.subtract({ years: range.years });
   }
 
+  // Use same method as manual selection (toDate(getLocalTimeZone()))
+  // End date should include the full current day (23:59:59)
   selected.value = {
     start: startDate.toDate(getLocalTimeZone()),
-    end: endDate.toDate(getLocalTimeZone()),
+    end: new Date(endDate.toDate(getLocalTimeZone()).setHours(23, 59, 59, 999)),
   };
 };
 </script>

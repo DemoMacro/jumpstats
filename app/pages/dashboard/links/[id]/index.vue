@@ -45,6 +45,8 @@ const {
   activeTabData,
   activeTabKey,
   loading,
+  timeGranularity,
+  setTimeGranularity,
   setTab,
 } = useLinkAnalytics(linkId, rangeRef);
 
@@ -65,8 +67,20 @@ const formatNumber = (value: number) => {
   return new Intl.NumberFormat("en-US").format(value);
 };
 
-const formatDate = (date: Date) => {
-  return format(date, "MMM d");
+const formatDate = (date: Date, granularity: typeof timeGranularity.value) => {
+  // date-fns format automatically uses local timezone
+  switch (granularity) {
+    case "hour":
+      return format(date, "MMM d HH:00");
+    case "day":
+      return format(date, "MMM d");
+    case "week":
+      return format(date, "MMM d");
+    case "month":
+      return format(date, "MMM yyyy");
+    default:
+      return format(date, "MMM d");
+  }
 };
 
 const x = (_: DataRecord, i: number) => i;
@@ -74,10 +88,11 @@ const y = (d: DataRecord) => d.amount;
 
 const xTicks = (i: number) => {
   if (!chartData.value[i]) return "";
-  return formatDate(chartData.value[i].date);
+  return formatDate(chartData.value[i].date, timeGranularity.value);
 };
 
-const template = (d: DataRecord) => `${formatDate(d.date)}: ${formatNumber(d.amount)} clicks`;
+const template = (d: DataRecord) =>
+  `${formatDate(d.date, timeGranularity.value)}: ${formatNumber(d.amount)} clicks`;
 
 const getPercentage = (item: AnalyticsRecord) => {
   return totalClicks.value > 0 ? Math.round((Number(item.clicks) / totalClicks.value) * 100) : 0;
@@ -158,9 +173,19 @@ const getPercentage = (item: AnalyticsRecord) => {
     <!-- Main Chart -->
     <UCard ref="cardRef" :ui="{ root: 'overflow-visible', body: '!px-0 !pt-0 !pb-3' }">
       <template #header>
-        <div>
-          <h3 class="text-lg font-semibold">Click Trend</h3>
-          <p class="text-sm text-muted-foreground">Clicks over time</p>
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-semibold">Click Trend</h3>
+            <p class="text-sm text-muted-foreground">Clicks over time</p>
+          </div>
+
+          <!-- Time Granularity Selector -->
+          <USelectMenu
+            v-model="timeGranularity"
+            :items="['hour', 'day', 'week', 'month']"
+            size="sm"
+            class="w-32"
+          />
         </div>
       </template>
 
