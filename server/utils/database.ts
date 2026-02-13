@@ -4,6 +4,7 @@ import {
   type ClickHouseConfig,
   ClickHouseConnection,
   createQueryBuilder,
+  logger,
 } from "@hypequery/clickhouse";
 import type { Database } from "~~/shared/types/database";
 import type { AnalyticsSchema } from "~~/shared/types/analytics";
@@ -22,6 +23,11 @@ const chdbConfig: ClickHouseConfig = {
   username: process.env.CLICKHOUSE_USERNAME!,
   password: process.env.CLICKHOUSE_PASSWORD!,
 };
+
+// Configure hypequery logger to only show warnings and errors
+logger.configure({
+  level: "warn",
+});
 
 // Initialize with default database first, then create target database
 const defaultConfig: ClickHouseConfig = {
