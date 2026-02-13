@@ -73,17 +73,17 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     const { $authClient } = useNuxtApp();
 
-    const result = await $authClient.signUp.email({
+    const { data, error } = await $authClient.signUp.email({
       name: payload.data.name,
       username: payload.data.username,
       email: payload.data.email,
       password: payload.data.password,
     });
 
-    if (result.error) {
+    if (error) {
       toast.add({
         title: "Sign Up Error",
-        description: result.error.message || "Failed to create account",
+        description: error.message || "Failed to create account",
         color: "error",
       });
       return;

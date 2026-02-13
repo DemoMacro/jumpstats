@@ -37,18 +37,27 @@ async function handleSignOut() {
   try {
     const { $authClient } = useNuxtApp();
 
-    await $authClient.signOut({
-      fetchOptions: {
-        onSuccess: async () => {
-          toast.add({
-            title: "Signed Out",
-            description: "You have been successfully signed out",
-            color: "success",
-          });
-          await navigateTo("/auth/sign-in");
-        },
-      },
+    const { error } = await $authClient.signOut();
+
+    if (error) {
+      toast.add({
+        title: "Sign Out Error",
+        description: error.message || "Failed to sign out",
+        color: "error",
+      });
+      return;
+    }
+
+    // Refresh session after successful sign out
+    await $authClient.getSession();
+
+    toast.add({
+      title: "Signed Out",
+      description: "You have been successfully signed out",
+      color: "success",
     });
+
+    await navigateTo("/auth/sign-in");
   } catch (error) {
     toast.add({
       title: "Sign Out Error",

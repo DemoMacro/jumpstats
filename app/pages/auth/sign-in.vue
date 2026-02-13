@@ -46,31 +46,34 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     // Check if identifier is email or username
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.data.identifier);
 
-    let result;
-    if (isEmail) {
-      result = await $authClient.signIn.email({
-        email: payload.data.identifier,
-        password: payload.data.password,
-        rememberMe: payload.data.rememberMe,
-        callbackURL: "/dashboard",
-      });
-    } else {
-      result = await $authClient.signIn.username({
-        username: payload.data.identifier,
-        password: payload.data.password,
-        rememberMe: payload.data.rememberMe,
-        callbackURL: "/dashboard",
-      });
-    }
+    const { data, error } = isEmail
+      ? await $authClient.signIn.email({
+          email: payload.data.identifier,
+          password: payload.data.password,
+          rememberMe: payload.data.rememberMe,
+          callbackURL: "/dashboard",
+        })
+      : await $authClient.signIn.username({
+          username: payload.data.identifier,
+          password: payload.data.password,
+          rememberMe: payload.data.rememberMe,
+          callbackURL: "/dashboard",
+        });
 
-    if (result.error) {
-      console.log(result.error);
+    if (error) {
       toast.add({
         title: "Sign In Error",
-        description: result.error.message || "Invalid credentials",
+        description: error.message || "Invalid credentials",
         color: "error",
       });
       return;
+    }
+
+    // Refresh session after successful sign in
+    if (data) {
+      await $authClient.getSession();
+
+      await navigateTo("/dashboard", { replace: true });
     }
 
     toast.add({
