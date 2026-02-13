@@ -1,8 +1,14 @@
 import { chdbClient } from "~~/server/utils/database";
+import { getMigrations } from "better-auth/db/migration";
+import { authConfig } from "~~/server/utils/auth";
 
 export default defineNitroPlugin(async () => {
   setTimeout(async () => {
     try {
+      // ==========================================
+      // 1. Initialize ClickHouse database for analytics
+      // ==========================================
+
       // Create database if not exists
       await chdbClient.command({
         query: `CREATE DATABASE IF NOT EXISTS jumpstats`,
@@ -87,6 +93,38 @@ export default defineNitroPlugin(async () => {
       console.log("✅ ClickHouse database and tables initialized successfully");
     } catch (error) {
       console.error("❌ Failed to initialize ClickHouse:", error);
+    }
+
+    // ==========================================
+    // 2. Run Better Auth database migrations
+    // ==========================================
+    try {
+      const { toBeCreated, toBeAdded, runMigrations } = await getMigrations(authConfig);
+
+      // Check what migrations are needed
+      if (toBeCreated.length > 0 || toBeAdded.length > 0) {
+        console.log("📋 Better Auth Migrations Required:");
+        console.log(
+          "   Tables to create:",
+          toBeCreated.map((t) => t.table),
+        );
+        console.log(
+          "   Fields to add:",
+          toBeAdded.map((t) => t.table),
+        );
+
+        // Run migrations
+        await runMigrations();
+        console.log("✅ Better Auth migrations completed successfully");
+      } else {
+        console.log("✅ Better Auth database schema is up to date");
+      }
+
+      // Optional: Log SQL for debugging
+      // const sql = await compileMigrations();
+      // console.log("Migration SQL:", sql);
+    } catch (error) {
+      console.error("❌ Failed to run Better Auth migrations:", error);
     }
   }, 1000);
 });

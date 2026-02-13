@@ -1,9 +1,9 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { username, admin, apiKey, organization, openAPI } from "better-auth/plugins";
 import { Pool } from "pg";
 import { link } from "../../../shared/utils/auth/link";
 
-export const auth = betterAuth({
+export const authConfig = {
   basePath: "/api",
   database: new Pool({
     // connection options
@@ -19,4 +19,6 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [username(), admin(), apiKey(), organization(), openAPI(), link()],
-});
+} satisfies BetterAuthOptions;
+
+export const auth = betterAuth(authConfig);
