@@ -7,16 +7,67 @@ import ipsbDriver from "geoip0/drivers/ipsb";
 import { chdbClient } from "~~/server/utils/database";
 import type { Link } from "~~/shared/types/link";
 import type { GeoLocation } from "geoip0";
+import { isValidIP, isPrivateIPv4, isPrivateIPv6, isLoopbackIPv4, isLoopbackIPv6 } from "ipdo";
 
 // GeoIP manager singleton
 const geoip = createGeoIPManager({ driver: ipsbDriver() });
+
+/**
+ * Get real client IP from various headers provided by different hosting platforms
+ * Priority order: Most reliable specific headers > Platform-specific headers > Generic headers > fallback
+ */
+export function getClientIP(event: H3Event): string {
+  // Headers to check, in order of priority and reliability
+  const headers = [
+    // Most reliable - Cloudflare Enterprise
+    "true-client-ip",
+
+    // Platform-specific headers (most common first)
+    "cf-connecting-ip", // Cloudflare
+    "x-vercel-forwarded-for", // Vercel
+    "fly-client-ip", // Fly.io
+    "fastly-client-ip", // Fastly
+
+    // Generic headers (lower reliability, easily spoofed)
+    "x-forwarded-for", // Standard proxy/load balancer
+    "x-real-ip", // Nginx/Apache
+    "x-client-ip", // Some proxies
+  ];
+
+  for (const header of headers) {
+    const value = getHeader(event, header);
+    if (value) {
+      // x-forwarded-for may contain multiple IPs: "client, proxy1, proxy2"
+      // Find the first valid public IP
+      const ips = value.split(",").map((ip) => ip.trim());
+
+      for (const ip of ips) {
+        // Validate IP using ipdo - check if valid, not private, not loopback
+        if (
+          ip &&
+          ip !== "unknown" &&
+          isValidIP(ip) &&
+          !isPrivateIPv4(ip) &&
+          !isPrivateIPv6(ip) &&
+          !isLoopbackIPv4(ip) &&
+          !isLoopbackIPv6(ip)
+        ) {
+          return ip;
+        }
+      }
+    }
+  }
+
+  // Fallback to h3's built-in method
+  return getRequestIP(event, { xForwardedFor: true }) ?? "";
+}
 
 /**
  * Track a click event and store it in ClickHouse
  */
 export async function trackClickEvent(event: H3Event, link: Link): Promise<void> {
   try {
-    const ip = getRequestIP(event, { xForwardedFor: true }) ?? "";
+    const ip = getClientIP(event);
     const userAgent = getHeader(event, "user-agent") ?? "";
     const referrer = getHeader(event, "referer") ?? "";
 

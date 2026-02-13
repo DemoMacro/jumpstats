@@ -22,6 +22,7 @@
         "date-fns": "4.1.0",
         "geoip0": "0.0.12",
         "ioredis": "5.9.2",
+        "ipdo": "0.0.6",
         "isbot": "5.1.35",
         "kysely": "0.28.11",
         "nuxt": "4.3.1",
@@ -1746,7 +1747,7 @@
 
     "ipaddr.js": ["ipaddr.js@1.9.1", "", {}, "sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g=="],
 
-    "ipdo": ["ipdo@0.0.5", "", {}, "sha512-TZq16V9BRAapOTehR1Xt0bdc079O6idoyBsvIqruAUSg9wMFx4TrMPjKDZAH5wkdshRp4zOrp+R80D+z32te4A=="],
+    "ipdo": ["ipdo@0.0.6", "", {}, "sha512-R9ZDWatudDkd4kXSY3971HxEJoqJB4COBWKQaWM9JCzWm5JFeik5ooCy8WHtoIvoAWSOENweSqaER2pK/t1Usw=="],
 
     "iron-webcrypto": ["iron-webcrypto@1.2.1", "", {}, "sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg=="],
 
@@ -3095,6 +3096,8 @@
     "fdir/picomatch": ["picomatch@4.0.3", "", {}, "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="],
 
     "geoip0/h3": ["h3@2.0.1-rc.5", "", { "dependencies": { "rou3": "^0.7.9", "srvx": "^0.9.1" }, "peerDependencies": { "crossws": "^0.4.1" }, "optionalPeers": ["crossws"] }, "sha512-qkohAzCab0nLzXNm78tBjZDvtKMTmtygS8BJLT3VPczAQofdqlFXDPkXdLMJN4r05+xqneG8snZJ0HgkERCZTg=="],
+
+    "geoip0/ipdo": ["ipdo@0.0.5", "", {}, "sha512-TZq16V9BRAapOTehR1Xt0bdc079O6idoyBsvIqruAUSg9wMFx4TrMPjKDZAH5wkdshRp4zOrp+R80D+z32te4A=="],
 
     "giget/nypm": ["nypm@0.6.5", "", { "dependencies": { "citty": "^0.2.0", "pathe": "^2.0.3", "tinyexec": "^1.0.2" }, "bin": { "nypm": "dist/cli.mjs" } }, "sha512-K6AJy1GMVyfyMXRVB88700BJqNUkByijGJM8kEHpLdcAt+vSQAVfkWWHYzuRXHSY6xA2sNc5RjTj0p9rE2izVQ=="],
 
