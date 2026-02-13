@@ -13,7 +13,7 @@ const open = ref(false);
 const loading = ref(false);
 
 const schema = z.object({
-  originalUrl: z.string().url("Please enter a valid URL"),
+  originalUrl: z.url("Please enter a valid URL"),
   title: z.string().max(200).optional(),
   description: z.string().max(500).optional(),
 });
