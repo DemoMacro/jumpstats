@@ -8,18 +8,8 @@ definePageMeta({
   title: "Links - Dashboard - JumpStats",
 });
 
-const loading = ref(false);
-const links = ref<Link[]>([]);
-const total = ref(0);
-const searchValue = ref("");
-
 const table = useTemplateRef("table");
-const columnFilters = ref([
-  {
-    id: "originalUrl",
-    value: "",
-  },
-]);
+const globalFilter = ref("");
 const columnVisibility = ref();
 const rowSelection = ref({});
 
@@ -51,51 +41,47 @@ async function copyToClipboard(shortCode: string) {
   }
 }
 
-async function fetchLinks() {
-  loading.value = true;
-  try {
+// Fetch data using useAsyncData with SSR support and automatic caching
+const {
+  data: linksData,
+  pending: loading,
+  refresh: fetchLinks,
+  error,
+} = await useAsyncData(
+  "links",
+  async () => {
     const result = await $authClient.link.list({
-      query: {
-        limit: pagination.value.pageSize,
-        offset: pagination.value.pageIndex * pagination.value.pageSize,
-      },
+      query: {},
     });
+    return result.data;
+  },
+  {
+    transform: (data) => ({
+      links: data?.links ?? [],
+      total: data?.total ?? 0,
+    }),
+  },
+);
 
-    if (result.data) {
-      links.value = result.data.links;
-      total.value = result.data.total;
-    }
-  } catch (error) {
+const links = computed(() => linksData.value?.links ?? []);
+const total = computed(() => linksData.value?.total ?? 0);
+
+// Watch for errors and display toast notification
+watch(error, (newError) => {
+  if (newError) {
     toast.add({
       title: "Error",
       description: "Failed to fetch links",
       color: "error",
     });
-  } finally {
-    loading.value = false;
   }
-}
-
-watch(
-  () => columnFilters.value[0]?.value,
-  () => {
-    fetchLinks();
-  },
-);
-
-watch(
-  pagination,
-  () => {
-    fetchLinks();
-  },
-  { deep: true },
-);
-
-onMounted(() => {
-  fetchLinks();
 });
 
 const columns: TableColumn<Link>[] = [
+  {
+    accessorKey: "title",
+    header: "Title",
+  },
   {
     accessorKey: "shortCode",
     header: "Short Code",
@@ -107,10 +93,6 @@ const columns: TableColumn<Link>[] = [
   {
     accessorKey: "status",
     header: "Status",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
   },
   {
     accessorKey: "actions",
@@ -134,11 +116,10 @@ const columns: TableColumn<Link>[] = [
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
-            :model-value="table?.tableApi?.getColumn('originalUrl')?.getFilterValue() as string"
+            v-model="globalFilter"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Filter links..."
-            @update:model-value="table?.tableApi?.getColumn('originalUrl')?.setFilterValue($event)"
+            placeholder="Search by title, short code, or URL..."
           />
 
           <div class="flex flex-wrap items-center gap-2">
@@ -165,7 +146,7 @@ const columns: TableColumn<Link>[] = [
         <div class="flex-1">
           <UTable
             ref="table"
-            v-model:column-filters="columnFilters"
+            v-model:global-filter="globalFilter"
             v-model:column-visibility="columnVisibility"
             v-model:row-selection="rowSelection"
             v-model:pagination="pagination"
@@ -187,6 +168,12 @@ const columns: TableColumn<Link>[] = [
               <span class="font-mono text-sm">{{ row.getValue("shortCode") }}</span>
             </template>
 
+            <template #title-cell="{ row }">
+              <span class="text-sm font-medium">
+                {{ row.getValue("title") || row.getValue("shortCode") }}
+              </span>
+            </template>
+
             <template #originalUrl-cell="{ row }">
               <span class="text-sm truncate block max-w-md">
                 {{ row.getValue("originalUrl") }}
@@ -200,12 +187,6 @@ const columns: TableColumn<Link>[] = [
               >
                 {{ row.getValue("status") }}
               </UBadge>
-            </template>
-
-            <template #createdAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
-                {{ new Date(row.getValue("createdAt")).toLocaleDateString() }}
-              </span>
             </template>
 
             <template #actions-cell="{ row }">
@@ -244,14 +225,15 @@ const columns: TableColumn<Link>[] = [
         <!-- Pagination Footer -->
         <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
           <div class="text-sm text-muted-foreground">
-            Showing {{ links.length }} of {{ total }} links
+            Showing
+            {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} links
           </div>
 
           <div class="flex items-center gap-1.5">
             <UPagination
               :default-page="(table?.tableApi?.getState().pagination.pageIndex ?? 0) + 1"
               :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-              :total="total"
+              :total="table?.tableApi?.getFilteredRowModel().rows.length ?? 0"
               @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
             />
           </div>
