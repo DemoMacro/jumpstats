@@ -63,13 +63,39 @@ export function getClientIP(event: H3Event): string {
 }
 
 /**
+ * Anonymize IP address by removing the last octet
+ */
+function anonymizeIP(ip: string): string {
+  const parts = ip.split(".");
+  if (parts.length === 4) {
+    parts[3] = "0";
+    return parts.join(".");
+  }
+  // For IPv6 or other formats, return as-is
+  return ip;
+}
+
+/**
+ * Clean referrer by removing query parameters
+ */
+function cleanReferrer(referrer: string): string {
+  try {
+    const url = new URL(referrer);
+    return `${url.protocol}//${url.hostname}${url.pathname}`;
+  } catch {
+    // Invalid URL, return up to first ? if exists
+    return referrer.split("?")[0] ?? referrer;
+  }
+}
+
+/**
  * Track a click event and store it in ClickHouse
  */
 export async function trackClickEvent(event: H3Event, link: Link): Promise<void> {
   try {
-    const ip = getClientIP(event);
+    const ip = anonymizeIP(getClientIP(event));
     const userAgent = getHeader(event, "user-agent") ?? "";
-    const referrer = getHeader(event, "referer") ?? "";
+    const referrer = cleanReferrer(getHeader(event, "referer") ?? "");
 
     // Parse User-Agent
     const ua = UAParser(userAgent);
@@ -159,8 +185,6 @@ export async function trackClickEvent(event: H3Event, link: Link): Promise<void>
           region: geo?.region ?? "",
           regionCode: geo?.regionCode ?? "",
           city: geo?.city ?? "",
-          latitude: geo?.latitude ?? null,
-          longitude: geo?.longitude ?? null,
           timezone: geo?.timezone ?? "",
           isp: geo?.isp ?? "",
           org: geo?.org ?? "",
@@ -182,7 +206,6 @@ export async function trackClickEvent(event: H3Event, link: Link): Promise<void>
 
           // Request
           referrer,
-          userAgent,
         },
       ],
       format: "JSONEachRow",

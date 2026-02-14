@@ -51,8 +51,6 @@ export type AnalyticsSchema = {
     region: "LowCardinality(String)";
     regionCode: "LowCardinality(String)";
     city: "LowCardinality(String)";
-    latitude: "Nullable(Float64)"; // Nullable because 0,0 is a valid coordinate
-    longitude: "Nullable(Float64)";
     timezone: "LowCardinality(String)";
     isp: "LowCardinality(String)";
     org: "LowCardinality(String)";
@@ -78,6 +76,5 @@ export type AnalyticsSchema = {
 
     // Request info
     referrer: "String"; // Full URL, may have high cardinality
-    userAgent: "String"; // Full UA string, keep for debugging
   };
 };

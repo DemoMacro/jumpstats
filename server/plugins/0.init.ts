@@ -58,8 +58,6 @@ export default defineNitroPlugin(async () => {
             region LowCardinality(String),
             regionCode LowCardinality(String),
             city LowCardinality(String),
-            latitude Nullable(Float64),
-            longitude Nullable(Float64),
             timezone LowCardinality(String),
             isp LowCardinality(String),
             org LowCardinality(String),
@@ -80,8 +78,7 @@ export default defineNitroPlugin(async () => {
             queryParams Map(String, String),
 
             -- Request info
-            referrer String,
-            userAgent String
+            referrer String
           )
           ENGINE = MergeTree()
           ORDER BY (linkId, toDate(timestamp), timestamp)
