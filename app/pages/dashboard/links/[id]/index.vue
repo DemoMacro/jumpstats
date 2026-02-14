@@ -67,6 +67,14 @@ const formatNumber = (value: number) => {
   return new Intl.NumberFormat("en-US").format(value);
 };
 
+const getWeekOfMonth = (date: Date) => {
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const dayOfMonth = date.getDate();
+  const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const weekNumber = Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
+  return weekNumber;
+};
+
 const formatDate = (date: Date, granularity: typeof timeGranularity.value) => {
   // date-fns format automatically uses local timezone
   switch (granularity) {
@@ -75,7 +83,7 @@ const formatDate = (date: Date, granularity: typeof timeGranularity.value) => {
     case "day":
       return format(date, "MMM d");
     case "week":
-      return format(date, "MMM d");
+      return `${format(date, "MMM")} Week ${getWeekOfMonth(date)}`;
     case "month":
       return format(date, "MMM yyyy");
     default:
