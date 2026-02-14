@@ -94,10 +94,12 @@ const items = computed<DropdownMenuItem[][]>(() => {
       {
         label: "Profile",
         icon: "i-lucide-user",
+        onSelect: () => navigateTo("/dashboard/settings"),
       },
       {
-        label: "Settings",
-        icon: "i-lucide-cog",
+        label: "Security",
+        icon: "i-lucide-shield",
+        onSelect: () => navigateTo("/dashboard/settings/security"),
       },
     ],
     [
