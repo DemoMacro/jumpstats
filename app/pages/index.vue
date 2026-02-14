@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import * as z from "zod";
 
+definePageMeta({
+  layout: "app",
+  title: "JumpStats - Shorten Your Links",
+  description:
+    "Transform long URLs into short, memorable links with powerful analytics and tracking.",
+});
+
 const { $authClient } = useNuxtApp();
 const toast = useToast();
+
+// Get current user session
+const { data: session } = await $authClient.useSession(useFetch);
 
 const schema = z.object({
   originalUrl: z
     .string()
     .transform((val) => val.trim())
     .refine(
-      (val) => val === "" || /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(val),
+      (val) => val === "" || /^[a-zA-Z][a-zA-Z\d+-.]*:/.test(val),
       "Please enter a valid URL",
     ),
 });
@@ -92,69 +102,139 @@ async function copyToClipboard() {
 </script>
 
 <template>
-  <UPageHero
-    title="JumpStats"
-    description="Shorten your links and track detailed analytics."
-    align="center"
-  >
-    <template #default>
-      <UContainer class="max-w-3xl">
-        <div class="flex flex-col items-center gap-8">
-          <UForm :schema="schema" :state="state" class="w-full" @submit="createShortLink">
-            <UFormField name="originalUrl">
-              <UFieldGroup class="w-full">
-                <UInput
-                  v-model="state.originalUrl"
-                  size="lg"
-                  placeholder="Paste your long URL here"
-                  :disabled="loading"
-                  class="flex-1"
-                />
-
-                <UButton
-                  type="submit"
-                  size="lg"
-                  :loading="loading"
-                  :disabled="!state.originalUrl || state.originalUrl.trim().length === 0"
-                >
-                  Shorten
-                </UButton>
-              </UFieldGroup>
-            </UFormField>
-          </UForm>
-
-          <UCard v-if="createdLink" class="w-full">
-            <div class="space-y-6">
-              <UFormField label="Your short link">
-                <div class="flex items-center gap-2">
+  <div>
+    <UPageHero
+      title="Shorten Your Links"
+      description="Transform long URLs into short, memorable links with powerful analytics and tracking."
+      align="center"
+    >
+      <template #default>
+        <UContainer class="max-w-3xl">
+          <div class="flex flex-col items-center gap-8">
+            <UForm :schema="schema" :state="state" class="w-full" @submit="createShortLink">
+              <UFormField name="originalUrl">
+                <UFieldGroup class="w-full">
                   <UInput
-                    :model-value="shortUrl"
+                    v-model="state.originalUrl"
+                    size="lg"
+                    placeholder="Paste your long URL here"
+                    :disabled="loading"
+                    class="flex-1"
+                  />
+
+                  <UButton
+                    type="submit"
+                    size="lg"
+                    :loading="loading"
+                    :disabled="!state.originalUrl || state.originalUrl.trim().length === 0"
+                  >
+                    Shorten
+                  </UButton>
+                </UFieldGroup>
+              </UFormField>
+            </UForm>
+
+            <UCard v-if="createdLink" class="w-full">
+              <div class="space-y-6">
+                <UFormField label="Your short link">
+                  <div class="flex items-center gap-2">
+                    <UInput
+                      :model-value="shortUrl"
+                      readonly
+                      size="md"
+                      color="neutral"
+                      variant="outline"
+                      class="flex-1"
+                    />
+                    <UButton icon="i-lucide-copy" size="md" @click="copyToClipboard">
+                      Copy
+                    </UButton>
+                  </div>
+                </UFormField>
+
+                <USeparator />
+
+                <UFormField label="Original URL">
+                  <UInput
+                    :model-value="createdLink.originalUrl"
                     readonly
                     size="md"
                     color="neutral"
                     variant="outline"
-                    class="flex-1"
+                    class="w-full"
                   />
-                  <UButton icon="i-lucide-copy" size="md" @click="copyToClipboard"> Copy </UButton>
-                </div>
-              </UFormField>
+                </UFormField>
+              </div>
+            </UCard>
+          </div>
+        </UContainer>
+      </template>
+    </UPageHero>
 
-              <USeparator />
+    <UPageSection
+      id="features"
+      title="Features"
+      description="Everything you need to manage and track your links"
+      :features="[
+        {
+          icon: 'i-lucide-link',
+          title: 'Link Shortening',
+          description:
+            'Transform long URLs into short, memorable links that are easy to share and remember.',
+        },
+        {
+          icon: 'i-lucide-bar-chart-2',
+          title: 'Detailed Analytics',
+          description:
+            'Track clicks, countries, devices, browsers, and more with interactive charts.',
+        },
+        {
+          icon: 'i-lucide-clock',
+          title: 'Time Series Data',
+          description:
+            'View your link performance over time with hourly, daily, and weekly aggregations.',
+        },
+        {
+          icon: 'i-lucide-globe',
+          title: 'Geographic Insights',
+          description: 'See where your clicks are coming from with country and city breakdowns.',
+        },
+        {
+          icon: 'i-lucide-tag',
+          title: 'UTM Tracking',
+          description:
+            'Understand your marketing campaigns with source, medium, and term tracking.',
+        },
+        {
+          icon: 'i-lucide-qr-code',
+          title: 'QR Code Generation',
+          description:
+            'Generate QR codes for your short links instantly, perfect for print materials and offline marketing.',
+        },
+      ]"
+    />
 
-              <UFormField label="Original URL">
-                <UInput
-                  :model-value="createdLink.originalUrl"
-                  readonly
-                  size="md"
-                  color="neutral"
-                  variant="outline"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
-          </UCard>
-        </div>
-      </UContainer>
-    </template>
-  </UPageHero>
+    <UPageSection>
+      <UPageCTA
+        title="Ready to Get Started?"
+        description="Create your first short link and start tracking today."
+        :links="[
+          {
+            label: 'Get Started',
+            to: session?.user ? '/dashboard' : '/auth/sign-up',
+            trailingIcon: 'i-lucide-arrow-right',
+            color: 'neutral',
+          },
+          {
+            label: 'View on GitHub',
+            to: 'https://github.com/DemoMacro/JumpStats',
+            target: '_blank',
+            icon: 'i-simple-icons-github',
+            color: 'neutral',
+            variant: 'outline',
+          },
+        ]"
+      />
+    </UPageSection>
+  </div>
 </template>
