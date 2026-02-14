@@ -66,7 +66,7 @@ async function deleteOrganization() {
     open.value = false;
 
     // Reset form
-    state.confirmText = undefined;
+    state.confirmText = "";
   } catch (error) {
     toast.add({
       title: "Error",

@@ -209,7 +209,7 @@ const columns: TableColumn<Link>[] = [
                   @click="copyToClipboard((row.original as Link).shortCode)"
                 />
 
-                <DashboardLinksDeleteModal :link="row.original as Link" @refresh="fetchLinks">
+                <DashboardLinksDeleteModal :link="row.original" @refresh="fetchLinks">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"

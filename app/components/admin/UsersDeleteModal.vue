@@ -11,7 +11,6 @@ const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
-const confirmText = ref("");
 
 const emit = defineEmits<{
   refresh: [];
@@ -27,7 +26,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
-  confirmText: undefined,
+  confirmText: "",
 });
 
 // Delete user using Better-Auth admin plugin
@@ -66,7 +65,7 @@ async function deleteUser() {
     open.value = false;
 
     // Reset form
-    state.confirmText = undefined;
+    state.confirmText = "";
   } catch (error) {
     toast.add({
       title: "Error",

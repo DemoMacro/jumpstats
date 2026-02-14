@@ -15,7 +15,6 @@ const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
-const confirmText = ref("");
 
 const schema = z.object({
   confirmText: z.string().refine((val) => val === props.link?.shortCode, {
@@ -26,7 +25,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
-  confirmText: undefined,
+  confirmText: "",
 });
 
 async function deleteLink() {
@@ -62,7 +61,7 @@ async function deleteLink() {
 
     emit("refresh");
     open.value = false;
-    state.confirmText = undefined;
+    state.confirmText = "";
   } catch (error) {
     toast.add({
       title: "Error",
@@ -77,6 +76,8 @@ async function deleteLink() {
 
 <template>
   <UModal v-model:open="open" title="Delete Link" description="This action cannot be undone">
+    <slot />
+
     <template #body>
       <div class="space-y-4">
         <p class="text-muted-foreground">
