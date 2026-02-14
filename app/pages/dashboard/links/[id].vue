@@ -9,7 +9,36 @@ definePageMeta({
 const route = useRoute();
 const linkId = route.params.id as string;
 
+const toast = useToast();
+
 const { link, loading, error, fetchLink } = useLinkDetail(linkId);
+
+const { copy, copied, isSupported } = useClipboard();
+
+// Watch copied state and show toast notification
+watch(copied, (isCopied) => {
+  if (isCopied) {
+    toast.add({
+      title: "Success",
+      description: "Link copied to clipboard",
+      color: "success",
+    });
+  }
+});
+
+async function copyToClipboard(shortCode: string) {
+  if (!isSupported.value) {
+    toast.add({
+      title: "Error",
+      description: "Clipboard not supported in this browser",
+      color: "error",
+    });
+    return;
+  }
+
+  const url = `${window.location.origin}/s/${shortCode}`;
+  await copy(url);
+}
 
 // Get analytics composables - they create and manage their own refs
 const { range } = useLinkAnalytics(linkId);
@@ -46,6 +75,37 @@ onMounted(() => {
       <UDashboardNavbar :title="`Link - ${link?.shortCode || 'Unknown'}`">
         <template #leading>
           <UDashboardSidebarCollapse />
+        </template>
+
+        <template #trailing>
+          <div v-if="link" class="flex items-center gap-2">
+            <UButton
+              icon="i-lucide-copy"
+              color="neutral"
+              variant="ghost"
+              title="Copy Link"
+              @click="copyToClipboard(link.shortCode)"
+            />
+
+            <UPopover>
+              <UButton
+                icon="i-lucide-qr-code"
+                color="neutral"
+                variant="ghost"
+                title="Show QR Code"
+              />
+
+              <template #content>
+                <div class="p-4">
+                  <img
+                    :src="`/qr/${link.shortCode}`"
+                    :alt="`QR Code for ${link.shortCode}`"
+                    class="w-32 h-32"
+                  />
+                </div>
+              </template>
+            </UPopover>
+          </div>
         </template>
       </UDashboardNavbar>
 

@@ -20,25 +20,32 @@ const pagination = ref({
 
 const toast = useToast();
 const { $authClient } = useNuxtApp();
-const config = useRuntimeConfig();
 
-async function copyToClipboard(shortCode: string) {
-  try {
-    const baseUrl = config.public.appUrl || window.location.origin;
-    const url = `${baseUrl}/s/${shortCode}`;
-    await navigator.clipboard.writeText(url);
+const { copy, copied, isSupported } = useClipboard();
+
+// Watch copied state and show toast notification
+watch(copied, (isCopied) => {
+  if (isCopied) {
     toast.add({
       title: "Success",
       description: "Link copied to clipboard",
       color: "success",
     });
-  } catch (error) {
+  }
+});
+
+async function copyToClipboard(shortCode: string) {
+  if (!isSupported.value) {
     toast.add({
       title: "Error",
-      description: "Failed to copy link",
+      description: "Clipboard not supported in this browser",
       color: "error",
     });
+    return;
   }
+
+  const url = `${window.location.origin}/s/${shortCode}`;
+  await copy(url);
 }
 
 // Fetch data using useAsyncData with SSR support and automatic caching
@@ -208,6 +215,20 @@ const columns: TableColumn<Link>[] = [
                   title="Copy Link"
                   @click="copyToClipboard((row.original as Link).shortCode)"
                 />
+
+                <UPopover>
+                  <UButton variant="ghost" icon="i-lucide-qr-code" title="Show QR Code" />
+
+                  <template #content>
+                    <div class="p-4">
+                      <img
+                        :src="`/qr/${(row.original as Link).shortCode}`"
+                        :alt="`QR Code for ${(row.original as Link).shortCode}`"
+                        class="w-32 h-32"
+                      />
+                    </div>
+                  </template>
+                </UPopover>
 
                 <DashboardLinksDeleteModal :link="row.original" @refresh="fetchLinks">
                   <UButton
