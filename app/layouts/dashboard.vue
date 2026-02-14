@@ -62,6 +62,14 @@ const dashboardLinks = [
       open.value = false;
     },
   },
+  {
+    label: "Domains",
+    icon: "i-lucide-globe",
+    to: "/dashboard/domains",
+    onSelect: () => {
+      open.value = false;
+    },
+  },
 ];
 
 const links = computed(() => {

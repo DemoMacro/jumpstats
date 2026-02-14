@@ -13,6 +13,16 @@ export const link = () => {
     schema: {
       link: {
         fields: {
+          domainId: {
+            type: "string",
+            required: false,
+            references: {
+              model: "domain",
+              field: "id",
+              onDelete: "set null",
+            },
+            index: true,
+          },
           shortCode: {
             type: "string",
             required: true,
@@ -54,6 +64,7 @@ export const link = () => {
           status: {
             type: "string",
             required: true,
+            defaultValue: "active",
           },
           expiresAt: {
             type: "date",

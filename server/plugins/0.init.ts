@@ -22,6 +22,7 @@ export default defineNitroPlugin(async () => {
             -- Primary keys
             id String,
             linkId String,
+            domainId String,
             shortCode String,
             originalUrl String,
             timestamp DateTime,
@@ -78,7 +79,10 @@ export default defineNitroPlugin(async () => {
             queryParams Map(String, String),
 
             -- Request info
-            referrer String
+            referrer String,
+
+            -- Domain info
+            domainName LowCardinality(String)
           )
           ENGINE = MergeTree()
           ORDER BY (linkId, toDate(timestamp), timestamp)

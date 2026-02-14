@@ -6,8 +6,16 @@ import {
   organizationClient,
 } from "better-auth/client/plugins";
 import { linkClient } from "~~/shared/utils/auth/link/client";
+import { domainClient } from "~~/shared/utils/auth/domain/client";
 
 export const authClient = createAuthClient({
   basePath: "/api",
-  plugins: [usernameClient(), adminClient(), apiKeyClient(), organizationClient(), linkClient()],
+  plugins: [
+    usernameClient(),
+    adminClient(),
+    apiKeyClient(),
+    organizationClient(),
+    linkClient(),
+    domainClient(),
+  ],
 });

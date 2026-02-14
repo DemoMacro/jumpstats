@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import type { Link } from "~~/shared/types/link";
+import type { Domain } from "~~/shared/types/domain";
 import { getPaginationRowModel } from "@tanstack/table-core";
 import { authClient } from "~/utils/auth";
-import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Links - Dashboard - JumpStats",
+  title: "Domains - Dashboard - JumpStats",
 });
 
 const table = useTemplateRef("table");
@@ -22,100 +21,71 @@ const pagination = ref({
 
 const toast = useToast();
 
-const { copy, copied, isSupported } = useClipboard();
-const { domains } = useDomains();
-
-// Helper function to get the actual domain for a link
-function getLinkDomain(link: Link) {
-  if (!link.domainId) {
-    return window.location.origin;
-  }
-  const domain = domains.value.find((d) => d.id === link.domainId);
-  return domain?.domainName || window.location.origin;
-}
-
-// Watch copied state and show toast notification
-watch(copied, (isCopied) => {
-  if (isCopied) {
+async function copyToClipboard(token: string) {
+  try {
+    await navigator.clipboard.writeText(token);
     toast.add({
       title: "Success",
-      description: "Link copied to clipboard",
+      description: "Verification token copied to clipboard",
       color: "success",
     });
-  }
-});
-
-async function copyToClipboard(link: Link) {
-  if (!isSupported.value) {
+  } catch {
     toast.add({
       title: "Error",
-      description: "Clipboard not supported in this browser",
+      description: "Failed to copy token",
       color: "error",
     });
-    return;
   }
-
-  const domain = getLinkDomain(link);
-  const url = `${domain}/s/${link.shortCode}`;
-  await copy(url);
 }
 
 // Fetch data using useAsyncData with SSR support and automatic caching
 const {
-  data: linksData,
+  data: domainsData,
   pending: loading,
-  refresh: fetchLinks,
+  refresh: fetchDomains,
   error,
 } = await useAsyncData(
-  "links",
+  "domains",
   async () => {
-    const result = await authClient.link.list({
+    const result = await authClient.domain.list({
       query: {},
     });
     return result.data;
   },
   {
     transform: (data) => ({
-      links: data?.links ?? [],
+      domains: data?.domains ?? [],
       total: data?.total ?? 0,
     }),
   },
 );
 
-const links = computed(() => linksData.value?.links ?? []);
-const total = computed(() => linksData.value?.total ?? 0);
+const domains = computed(() => domainsData.value?.domains ?? []);
+const total = computed(() => domainsData.value?.total ?? 0);
 
 // Watch for errors and display toast notification
 watch(error, (newError) => {
   if (newError) {
     toast.add({
       title: "Error",
-      description: "Failed to fetch links",
+      description: "Failed to fetch domains",
       color: "error",
     });
   }
 });
 
-const columns: TableColumn<Link>[] = [
+const columns: TableColumn<Domain>[] = [
   {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    accessorKey: "shortCode",
-    header: "Short Code",
-  },
-  {
-    accessorKey: "domainId",
-    header: "Domain",
-  },
-  {
-    accessorKey: "originalUrl",
-    header: "Destination URL",
+    accessorKey: "domainName",
+    header: "Domain Name",
   },
   {
     accessorKey: "status",
     header: "Status",
+  },
+  {
+    accessorKey: "verifiedAt",
+    header: "Verified",
   },
   {
     accessorKey: "actions",
@@ -125,9 +95,9 @@ const columns: TableColumn<Link>[] = [
 </script>
 
 <template>
-  <UDashboardPanel id="links">
+  <UDashboardPanel id="domains">
     <template #header>
-      <UDashboardNavbar title="Links">
+      <UDashboardNavbar title="Domains">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -142,11 +112,11 @@ const columns: TableColumn<Link>[] = [
             v-model="globalFilter"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Search by title, short code, or URL..."
+            placeholder="Search by domain name..."
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <UButton to="/dashboard/links/create" label="Add Link">
+            <UButton to="/dashboard/domains/create" label="Add Domain">
               <template #leading>
                 <UIcon name="i-lucide-plus" />
               </template>
@@ -176,7 +146,7 @@ const columns: TableColumn<Link>[] = [
             :pagination-options="{
               getPaginationRowModel: getPaginationRowModel(),
             }"
-            :data="links"
+            :data="domains"
             :columns="columns"
             :loading="loading"
             :ui="{
@@ -187,75 +157,93 @@ const columns: TableColumn<Link>[] = [
               td: 'border-b border-default',
             }"
           >
-            <template #shortCode-cell="{ row }">
-              <span class="font-mono text-sm">{{ row.getValue("shortCode") }}</span>
-            </template>
-
-            <template #title-cell="{ row }">
-              <span class="text-sm font-medium">
-                {{ row.getValue("title") || row.getValue("shortCode") }}
-              </span>
-            </template>
-
-            <template #domainId-cell="{ row }">
-              <span class="text-sm">
-                {{ getLinkDomain(row.original as Link) }}
-              </span>
-            </template>
-
-            <template #originalUrl-cell="{ row }">
-              <span class="text-sm truncate block max-w-md">
-                {{ row.getValue("originalUrl") }}
+            <template #domainName-cell="{ row }">
+              <span class="font-mono text-sm">
+                {{ row.getValue("domainName") }}
               </span>
             </template>
 
             <template #status-cell="{ row }">
               <UBadge
-                :color="row.getValue('status') === 'active' ? 'success' : 'neutral'"
+                :color="
+                  row.getValue('status') === 'active'
+                    ? 'success'
+                    : row.getValue('status') === 'inactive'
+                      ? 'error'
+                      : 'neutral'
+                "
                 variant="subtle"
               >
                 {{ row.getValue("status") }}
               </UBadge>
             </template>
 
+            <template #verifiedAt-cell="{ row }">
+              <span class="text-sm">
+                {{
+                  (row.original as Domain).verifiedAt
+                    ? new Date((row.original as Domain).verifiedAt as Date).toLocaleDateString()
+                    : "Not verified"
+                }}
+              </span>
+            </template>
+
             <template #actions-cell="{ row }">
               <div class="flex items-center gap-2">
                 <UButton
-                  :to="`/dashboard/links/${(row.original as Link).id}`"
-                  variant="ghost"
-                  icon="i-lucide-eye"
-                  title="View Details"
-                />
-
-                <UButton
                   variant="ghost"
                   icon="i-lucide-copy"
-                  title="Copy Link"
-                  @click="copyToClipboard(row.original as Link)"
+                  title="Copy Verification Token"
+                  :disabled="!row.original.verificationToken"
+                  @click="copyToClipboard((row.original as Domain).verificationToken || '')"
                 />
 
-                <UPopover>
-                  <UButton variant="ghost" icon="i-lucide-qr-code" title="Show QR Code" />
+                <UPopover v-if="row.original.verificationToken">
+                  <UButton variant="ghost" icon="i-lucide-info" title="Verification Info" />
 
                   <template #content>
-                    <div class="p-4">
-                      <img
-                        :src="`/qr/${(row.original as Link).shortCode}`"
-                        :alt="`QR Code for ${(row.original as Link).shortCode}`"
-                        class="w-32 h-32"
-                      />
+                    <div class="p-4 max-w-sm">
+                      <p class="text-sm font-medium mb-2">DNS Verification</p>
+                      <p class="text-sm text-muted-foreground mb-2">
+                        Add this TXT record to your domain's DNS configuration:
+                      </p>
+                      <div class="bg-muted rounded p-3 space-y-1">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-medium">Type:</span>
+                          <UBadge variant="subtle">TXT</UBadge>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-medium">Name:</span>
+                          <span class="text-sm font-mono">@</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-medium">Value:</span>
+                          <span class="text-sm font-mono text-xs break-all">
+                            {{ row.original.verificationToken }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </template>
                 </UPopover>
 
-                <DashboardLinksDeleteModal :link="row.original" @refresh="fetchLinks">
+                <DashboardDomainsVerifyModal
+                  v-if="row.original.status === 'pending'"
+                  :domain="row.original"
+                  @refresh="fetchDomains"
+                >
+                  <UButton variant="ghost" icon="i-lucide-refresh-cw" title="Verify Domain" />
+                </DashboardDomainsVerifyModal>
+
+                <DashboardDomainsDeleteModal :domain="row.original" @refresh="fetchDomains">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
-                    title="Delete Link"
+                    title="Delete Domain"
+                    :disabled="row.original.status === 'active'"
                   />
-                </DashboardLinksDeleteModal>
+                </DashboardDomainsDeleteModal>
               </div>
             </template>
           </UTable>
@@ -265,7 +253,7 @@ const columns: TableColumn<Link>[] = [
         <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
           <div class="text-sm text-muted-foreground">
             Showing
-            {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} links
+            {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} domains
           </div>
 
           <div class="flex items-center gap-1.5">

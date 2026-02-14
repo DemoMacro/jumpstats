@@ -2,6 +2,7 @@ import type { User, Session, Account, Verification } from "better-auth/types";
 import type { Organization, Member, Invitation } from "better-auth/plugins";
 import type { Generated } from "kysely";
 import type { Link } from "./link";
+import type { Domain } from "./domain";
 
 export interface Database {
   user: User;
@@ -12,4 +13,5 @@ export interface Database {
   member: Member;
   invitation: Invitation;
   link: Omit<Link, "id"> & { id: Generated<string> };
+  domain: Omit<Domain, "id"> & { id: Generated<string> };
 }

@@ -2,6 +2,7 @@
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { authClient } from "~/utils/auth";
+import { useDomains } from "~/composables/useDomains";
 
 const route = useRoute();
 const linkId = route.params.id as string;
@@ -9,9 +10,11 @@ const linkId = route.params.id as string;
 const { link, loading, error, fetchLink } = useLinkDetail(linkId);
 
 const toast = useToast();
+const { domainOptions, loading: domainsLoading } = useDomains();
 
 const schema = z.object({
   originalUrl: z.string().url("Please enter a valid URL"),
+  domainId: z.string().optional(),
   title: z.string().max(200).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
   status: z.enum(["active", "inactive", "expired"]).optional(),
@@ -19,11 +22,12 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive<Schema>({
-  originalUrl: "",
-  title: "",
-  description: "",
-  status: "active",
+const state = reactive<Partial<Schema>>({
+  originalUrl: undefined,
+  domainId: undefined,
+  title: undefined,
+  description: undefined,
+  status: undefined,
 });
 
 watch(
@@ -31,6 +35,7 @@ watch(
   (newLink) => {
     if (newLink) {
       state.originalUrl = newLink.originalUrl;
+      state.domainId = newLink.domainId || undefined;
       state.title = newLink.title;
       state.description = newLink.description;
       state.status = newLink.status;
@@ -45,7 +50,8 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
   try {
     const result = await authClient.link.update({
       linkId,
-      originalUrl: event.data.originalUrl,
+      originalUrl: event.data.originalUrl!,
+      domainId: event.data.domainId || null,
       title: event.data.title || null,
       description: event.data.description || null,
       status: event.data.status,
@@ -111,15 +117,34 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
         <UFormField
           name="originalUrl"
           label="Destination URL"
-          description="The URL this link points to"
+          description="The full URL you want to shorten (e.g., https://example.com/very-long-url)."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex flex-col gap-2"
         >
           <UInput
             v-model="state.originalUrl"
             placeholder="https://example.com/very-long-url"
             :disabled="submitting"
             class="w-full"
+          />
+        </UFormField>
+
+        <USeparator />
+
+        <UFormField
+          name="domainId"
+          label="Custom Domain (Optional)"
+          description="Select a verified custom domain for this link"
+          class="flex max-sm:flex-col justify-between items-start gap-4"
+        >
+          <USelect
+            v-if="domainOptions.length > 0"
+            v-model="state.domainId"
+            :items="domainOptions"
+            placeholder="Use default domain"
+            icon="i-lucide-globe"
+            :disabled="submitting || domainsLoading"
+            class="w-48"
           />
         </UFormField>
 
@@ -135,7 +160,7 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
             v-model="state.title"
             placeholder="My Awesome Link"
             :disabled="submitting"
-            class="w-full"
+            class="w-48"
           />
         </UFormField>
 

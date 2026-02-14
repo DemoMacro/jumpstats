@@ -16,6 +16,7 @@ export type AnalyticsSchema = {
     // Primary keys
     id: "String";
     linkId: "String";
+    domainId: "String";
     shortCode: "String";
     originalUrl: "String";
     timestamp: "DateTime";
@@ -77,6 +78,9 @@ export type AnalyticsSchema = {
 
     // Request info
     referrer: "String"; // Full URL, may have high cardinality
+
+    // Domain info
+    domainName: "LowCardinality(String)";
   };
 };
 
@@ -84,6 +88,7 @@ export type AnalyticsSchema = {
 export const ClickEventSchema = z.object({
   id: z.string(),
   linkId: z.string(),
+  domainId: z.string(),
   shortCode: z.string(),
   originalUrl: z.string(),
   timestamp: z.string(),
@@ -127,6 +132,9 @@ export const ClickEventSchema = z.object({
 
   // Custom query parameters
   queryParams: z.record(z.string(), z.string()),
+
+  // Domain info
+  domainName: z.string(),
 });
 
 export type ClickEvent = z.infer<typeof ClickEventSchema>;

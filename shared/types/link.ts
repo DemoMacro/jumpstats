@@ -4,6 +4,7 @@ export const LinkStatusSchema = z.enum(["active", "inactive", "expired"]);
 
 export const LinkSchema = z.object({
   id: z.uuid(),
+  domainId: z.uuid().nullable(),
   shortCode: z.string().min(1).max(50),
   originalUrl: z.url(),
   userId: z.uuid().nullable(),
@@ -18,11 +19,13 @@ export const LinkSchema = z.object({
 
 export const CreateLinkSchema = LinkSchema.pick({
   originalUrl: true,
+  domainId: true,
   organizationId: true,
   title: true,
   description: true,
   expiresAt: true,
 }).partial({
+  domainId: true,
   organizationId: true,
   title: true,
   description: true,
@@ -31,6 +34,7 @@ export const CreateLinkSchema = LinkSchema.pick({
 
 export const UpdateLinkSchema = LinkSchema.pick({
   originalUrl: true,
+  domainId: true,
   title: true,
   description: true,
   status: true,
@@ -39,6 +43,7 @@ export const UpdateLinkSchema = LinkSchema.pick({
 
 export const LinkQuerySchema = z.object({
   linkId: z.uuid().optional(),
+  domainId: z.uuid().optional(),
   organizationId: z.uuid().optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
   offset: z.coerce.number().int().min(0).optional(),

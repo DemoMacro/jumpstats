@@ -3,6 +3,8 @@ import { getSessionFromCtx } from "better-auth/api";
 import { CreateLinkSchema, type Link } from "../../../../types/link";
 import type { GenericEndpointContext } from "better-auth";
 import type { Member } from "better-auth/plugins";
+import type { Domain } from "../../../../types/domain";
+import { canAccessDomain } from "../../domain/permissions";
 
 export const createLink = () => {
   return createAuthEndpoint(
@@ -39,7 +41,7 @@ export const createLink = () => {
       // Optional authentication - allow anonymous link creation
       const session = await getSessionFromCtx(ctx);
 
-      const { organizationId, originalUrl, title, description, expiresAt } = ctx.body;
+      const { organizationId, originalUrl, title, description, expiresAt, domainId } = ctx.body;
 
       // Check organization membership if provided
       if (organizationId) {
@@ -70,6 +72,52 @@ export const createLink = () => {
         }
       }
 
+      // Validate domainId if provided
+      if (domainId) {
+        if (!session?.user) {
+          throw new APIError("UNAUTHORIZED", {
+            message: "Authentication required for custom domain links",
+          });
+        }
+
+        const domain = await ctx.context.adapter.findOne<Domain>({
+          model: "domain",
+          where: [
+            {
+              field: "id",
+              value: domainId,
+            },
+          ],
+        });
+
+        if (!domain) {
+          throw new APIError("NOT_FOUND", {
+            message: "Domain not found",
+          });
+        }
+
+        if (domain.status !== "active") {
+          throw new APIError("BAD_REQUEST", {
+            message: "Domain is not active. Only active domains can be used for links",
+          });
+        }
+
+        // Check user has permission to use this domain
+        const hasPermission = await canAccessDomain(ctx, domain, session);
+        if (!hasPermission) {
+          throw new APIError("FORBIDDEN", {
+            message: "You don't have permission to use this domain",
+          });
+        }
+
+        // Check organization match
+        if (domain.organizationId !== organizationId) {
+          throw new APIError("BAD_REQUEST", {
+            message: "Domain organization must match link organization",
+          });
+        }
+      }
+
       // Generate unique short code
       const shortCode = await generateUniqueShortCode(ctx);
 
@@ -78,6 +126,7 @@ export const createLink = () => {
         originalUrl,
         userId: session?.user?.id || null,
         organizationId: organizationId || null,
+        domainId: domainId || null,
         title: title || null,
         description: description || null,
         status: "active" as const,

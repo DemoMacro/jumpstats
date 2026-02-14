@@ -2,6 +2,8 @@ import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
 import { UpdateLinkBodySchema, type Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
+import type { Domain } from "../../../../types/domain";
+import { canAccessDomain } from "../../domain/permissions";
 
 export const updateLink = () => {
   return createAuthEndpoint(
@@ -61,6 +63,50 @@ export const updateLink = () => {
         throw new APIError("FORBIDDEN", {
           message: "You don't have permission to update this link",
         });
+      }
+
+      // Validate domainId if being updated
+      if ("domainId" in updateData && updateData.domainId !== undefined) {
+        const newDomainId = updateData.domainId;
+
+        if (newDomainId !== null) {
+          const domain = await ctx.context.adapter.findOne<Domain>({
+            model: "domain",
+            where: [
+              {
+                field: "id",
+                value: newDomainId,
+              },
+            ],
+          });
+
+          if (!domain) {
+            throw new APIError("NOT_FOUND", {
+              message: "Domain not found",
+            });
+          }
+
+          if (domain.status !== "active") {
+            throw new APIError("BAD_REQUEST", {
+              message: "Domain is not active. Only active domains can be used for links",
+            });
+          }
+
+          // Check user has permission to use this domain
+          const hasDomainPermission = await canAccessDomain(ctx, domain, session);
+          if (!hasDomainPermission) {
+            throw new APIError("FORBIDDEN", {
+              message: "You don't have permission to use this domain",
+            });
+          }
+
+          // Check organization match
+          if (domain.organizationId !== link.organizationId) {
+            throw new APIError("BAD_REQUEST", {
+              message: "Domain organization must match link organization",
+            });
+          }
+        }
       }
 
       // Update the link

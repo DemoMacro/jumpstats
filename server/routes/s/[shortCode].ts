@@ -39,8 +39,35 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Get requested host from headers
+  const host = getRequestHost(event);
+
+  // If link has custom domain, verify it matches requested host
+  if (link.domainId) {
+    const domain = await db
+      .selectFrom("domain")
+      .selectAll()
+      .where("id", "=", link.domainId)
+      .executeTakeFirst();
+
+    if (!domain || domain.status !== "active") {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Custom domain not verified or not found",
+      });
+    }
+
+    if (host !== domain.domainName) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Domain does not match requested host",
+      });
+    }
+  }
+
   // Track click event in background (non-blocking)
   event.waitUntil(trackClickEvent(event, link));
 
+  // Always redirect to the original URL
   return sendRedirect(event, link.originalUrl, 302);
 });

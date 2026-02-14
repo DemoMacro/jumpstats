@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
@@ -12,8 +13,19 @@ const linkId = route.params.id as string;
 const toast = useToast();
 
 const { link, loading, error, fetchLink } = useLinkDetail(linkId);
+const { domains } = useDomains();
 
 const { copy, copied, isSupported } = useClipboard();
+
+// Helper function to get the actual domain for a link
+function getLinkDomain() {
+  if (!link.value?.domainId) {
+    return window.location.origin;
+  }
+  const domainId = link.value.domainId;
+  const domain = domains.value.find((d) => d.id === domainId);
+  return domain?.domainName || window.location.origin;
+}
 
 // Watch copied state and show toast notification
 watch(copied, (isCopied) => {
@@ -26,7 +38,11 @@ watch(copied, (isCopied) => {
   }
 });
 
-async function copyToClipboard(shortCode: string) {
+async function copyToClipboard() {
+  if (!link.value) {
+    return;
+  }
+
   if (!isSupported.value) {
     toast.add({
       title: "Error",
@@ -36,7 +52,8 @@ async function copyToClipboard(shortCode: string) {
     return;
   }
 
-  const url = `${window.location.origin}/s/${shortCode}`;
+  const domain = getLinkDomain();
+  const url = `${domain}/s/${link.value.shortCode}`;
   await copy(url);
 }
 
@@ -84,7 +101,7 @@ onMounted(() => {
               color="neutral"
               variant="ghost"
               title="Copy Link"
-              @click="copyToClipboard(link.shortCode)"
+              @click="copyToClipboard"
             />
 
             <UPopover>

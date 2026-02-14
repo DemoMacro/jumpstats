@@ -12,9 +12,7 @@ const items = computed(
         {
           label: "Create Link",
           icon: "i-lucide-plus",
-          click: () => {
-            // Open create link modal - will be implemented
-          },
+          onSelect: () => navigateTo("/dashboard/links/create"),
         },
       ],
     ] satisfies DropdownMenuItem[][],
@@ -56,12 +54,10 @@ const items = computed(
             View All Links
           </UButton>
 
-          <DashboardLinksCreateModal>
-            <UButton variant="outline" class="justify-start">
-              <UIcon name="i-lucide-plus" class="mr-2" />
-              Create Link
-            </UButton>
-          </DashboardLinksCreateModal>
+          <UButton to="/dashboard/links/create" variant="outline" class="justify-start">
+            <UIcon name="i-lucide-plus" class="mr-2" />
+            Create Link
+          </UButton>
 
           <UButton variant="outline" class="justify-start" disabled title="Coming soon">
             <UIcon name="i-lucide-settings" class="mr-2" />

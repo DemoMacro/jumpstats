@@ -2,6 +2,7 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { username, admin, apiKey, organization, openAPI } from "better-auth/plugins";
 import { Pool } from "pg";
 import { link } from "../../../shared/utils/auth/link";
+import { domain } from "../../../shared/utils/auth/domain";
 
 export const authConfig = {
   basePath: "/api",
@@ -18,7 +19,7 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [username(), admin(), apiKey(), organization(), openAPI(), link()],
+  plugins: [username(), admin(), apiKey(), organization(), openAPI(), link(), domain()],
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth(authConfig);

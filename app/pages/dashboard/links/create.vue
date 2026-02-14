@@ -2,6 +2,7 @@
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { authClient } from "~/utils/auth";
+import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
@@ -10,8 +11,11 @@ definePageMeta({
 
 const toast = useToast();
 
+const { domainOptions, loading: domainsLoading } = useDomains();
+
 const schema = z.object({
   originalUrl: z.string().url("Please enter a valid URL"),
+  domainId: z.string().optional(),
   title: z.string().max(200).optional(),
   description: z.string().max(500).optional(),
   expiresAt: z.string().optional(),
@@ -19,11 +23,12 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = reactive<Schema>({
-  originalUrl: "",
-  title: "",
-  description: "",
-  expiresAt: "",
+const state = reactive<Partial<Schema>>({
+  originalUrl: undefined,
+  domainId: undefined,
+  title: undefined,
+  description: undefined,
+  expiresAt: undefined,
 });
 
 const submitting = ref(false);
@@ -32,7 +37,8 @@ async function createLink(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
     const result = await authClient.link.create({
-      originalUrl: event.data.originalUrl,
+      originalUrl: event.data.originalUrl!,
+      domainId: event.data.domainId || null,
       title: event.data.title || null,
       description: event.data.description || null,
       expiresAt: event.data.expiresAt ? new Date(event.data.expiresAt) : null,
@@ -110,13 +116,32 @@ async function createLink(event: FormSubmitEvent<Schema>) {
               label="Destination URL"
               description="The full URL you want to shorten (e.g., https://example.com/very-long-url)."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex flex-col gap-2"
             >
               <UInput
                 v-model="state.originalUrl"
                 placeholder="https://example.com/very-long-url"
                 :disabled="submitting"
                 class="w-full"
+              />
+            </UFormField>
+
+            <USeparator />
+
+            <UFormField
+              name="domainId"
+              label="Custom Domain (Optional)"
+              description="Select a verified custom domain for this link"
+              class="flex max-sm:flex-col justify-between items-start gap-4"
+            >
+              <USelect
+                v-if="domainOptions.length > 0"
+                v-model="state.domainId"
+                :items="domainOptions"
+                placeholder="Use default domain"
+                icon="i-lucide-globe"
+                :disabled="submitting || domainsLoading"
+                class="w-48"
               />
             </UFormField>
 
@@ -132,7 +157,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
                 v-model="state.title"
                 placeholder="My Awesome Link"
                 :disabled="submitting"
-                class="w-full"
+                class="w-48"
               />
             </UFormField>
 
