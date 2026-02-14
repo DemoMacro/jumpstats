@@ -1,8 +1,9 @@
+import { z } from "zod";
 import type { IResult } from "ua-parser-js";
 import type { GeoLocation } from "geoip0";
 
 // Re-export types for convenience
-export type { IResult as IUAResult, GeoLocation };
+export type { IResult as IUAAResult, GeoLocation };
 
 // ClickHouse schema for analytics
 // Following best practices:
@@ -78,3 +79,54 @@ export type AnalyticsSchema = {
     referrer: "String"; // Full URL, may have high cardinality
   };
 };
+
+// Schema for a single click event (all required fields, no .optional())
+export const ClickEventSchema = z.object({
+  id: z.string(),
+  linkId: z.string(),
+  shortCode: z.string(),
+  originalUrl: z.string(),
+  timestamp: z.string(),
+
+  // Browser info
+  browserName: z.string(),
+  browserType: z.string(),
+
+  // OS info
+  osName: z.string(),
+
+  // Device info
+  deviceType: z.string(),
+  deviceVendor: z.string(),
+  deviceModel: z.string(),
+
+  // Bot detection
+  isBot: z.number(),
+
+  // Geolocation info
+  country: z.string(),
+  countryCode: z.string(),
+  region: z.string(),
+  regionCode: z.string(),
+  city: z.string(),
+  timezone: z.string(),
+  isp: z.string(),
+  org: z.string(),
+  asn: z.string(),
+  accuracyRadius: z.string(),
+  isProxy: z.number(),
+  geoSource: z.string(),
+
+  // UTM parameters
+  utmSource: z.string(),
+  utmMedium: z.string(),
+  utmCampaign: z.string(),
+  utmTerm: z.string(),
+  utmContent: z.string(),
+  utmId: z.string(),
+
+  // Custom query parameters
+  queryParams: z.record(z.string(), z.string()),
+});
+
+export type ClickEvent = z.infer<typeof ClickEventSchema>;

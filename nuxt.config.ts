@@ -1,8 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
-  ssr: false,
-
   app: {
     keepalive: true,
   },
@@ -14,6 +12,15 @@ export default defineNuxtConfig({
   routeRules: {
     "/api/**": {
       cors: true,
+    },
+    "/admin/**": {
+      ssr: false,
+    },
+    "/dashboard/**": {
+      ssr: false,
+    },
+    "/sw.js": {
+      ssr: false,
     },
   },
 

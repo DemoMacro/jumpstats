@@ -23,6 +23,11 @@ const links = computed<NavigationMenuItem[][]>(() => [
       exact: true,
     },
     {
+      label: "Events",
+      icon: "i-lucide-list",
+      to: `/dashboard/links/${linkId}/events`,
+    },
+    {
       label: "Edit",
       icon: "i-lucide-edit",
       to: `/dashboard/links/${linkId}/edit`,
@@ -74,7 +79,7 @@ onMounted(() => {
         <UButton to="/dashboard/links">Back to Links</UButton>
       </div>
 
-      <div v-else class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full mx-auto">
+      <div v-else class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full h-full mx-auto">
         <NuxtPage :range="range" />
       </div>
     </template>
