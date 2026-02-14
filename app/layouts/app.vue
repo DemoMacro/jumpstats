@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
-const { $authClient } = useNuxtApp();
 const route = useRoute();
 
 // Get current user session
-const { data: session } = await $authClient.useSession(useFetch);
+const { data: session } = await authClient.useSession(useFetch);
 
 // Define navigation menu items
 const items = computed<NavigationMenuItem[]>(() => {

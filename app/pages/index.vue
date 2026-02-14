@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import * as z from "zod";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "app",
@@ -8,11 +9,10 @@ definePageMeta({
     "Transform long URLs into short, memorable links with powerful analytics and tracking.",
 });
 
-const { $authClient } = useNuxtApp();
 const toast = useToast();
 
 // Get current user session
-const { data: session } = await $authClient.useSession(useFetch);
+const { data: session } = await authClient.useSession(useFetch);
 
 const schema = z.object({
   originalUrl: z
@@ -38,7 +38,7 @@ async function createShortLink() {
   createdLink.value = null;
 
   try {
-    const result = await $authClient.link.create({
+    const result = await authClient.link.create({
       originalUrl: state.originalUrl,
       title: null,
       description: null,

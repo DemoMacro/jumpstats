@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -8,7 +9,6 @@ definePageMeta({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Form schema
 const schema = z.object({
@@ -38,7 +38,7 @@ const submitting = ref(false);
 async function createUser(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
-    const result = await $authClient.admin.createUser({
+    const result = await authClient.admin.createUser({
       email: event.data.email,
       name: event.data.name,
       password: event.data.password,

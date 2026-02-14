@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const toast = useToast();
 
@@ -41,19 +42,17 @@ const loading = ref(false);
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    const { $authClient } = useNuxtApp();
-
     // Check if identifier is email or username
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.data.identifier);
 
     const { data, error } = isEmail
-      ? await $authClient.signIn.email({
+      ? await authClient.signIn.email({
           email: payload.data.identifier,
           password: payload.data.password,
           rememberMe: payload.data.rememberMe,
           callbackURL: "/dashboard",
         })
-      : await $authClient.signIn.username({
+      : await authClient.signIn.username({
           username: payload.data.identifier,
           password: payload.data.password,
           rememberMe: payload.data.rememberMe,
@@ -71,7 +70,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     // Refresh session after successful sign in
     if (data) {
-      await $authClient.getSession();
+      await authClient.getSession();
 
       await navigateTo("/dashboard", { replace: true });
     }

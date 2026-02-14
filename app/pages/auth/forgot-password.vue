@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const toast = useToast();
 const loading = ref(false);
@@ -28,9 +29,7 @@ type Schema = z.output<typeof schema>;
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    const { $authClient } = useNuxtApp();
-
-    const result = await $authClient.requestPasswordReset({
+    const result = await authClient.requestPasswordReset({
       email: payload.data.email,
       redirectTo: "/auth/sign-in",
     });

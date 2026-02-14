@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const toast = useToast();
 
@@ -71,9 +72,7 @@ const loading = ref(false);
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
-    const { $authClient } = useNuxtApp();
-
-    const { data, error } = await $authClient.signUp.email({
+    const { data, error } = await authClient.signUp.email({
       name: payload.data.name,
       username: payload.data.username,
       email: payload.data.email,

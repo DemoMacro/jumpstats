@@ -1,4 +1,5 @@
 import type { Member } from "better-auth/plugins";
+import { authClient } from "~/utils/auth";
 
 export const useOrgMembers = (orgId: string) => {
   const members = ref<Member[]>([]);
@@ -10,8 +11,7 @@ export const useOrgMembers = (orgId: string) => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.listMembers({
+      const result = await authClient.organization.listMembers({
         query: {
           organizationId: orgId,
           limit: 1000, // Get all members for admin view
@@ -35,8 +35,7 @@ export const useOrgMembers = (orgId: string) => {
     resend: boolean = true,
   ) => {
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.inviteMember({
+      const result = await authClient.organization.inviteMember({
         email,
         role,
         organizationId: orgId,
@@ -61,8 +60,7 @@ export const useOrgMembers = (orgId: string) => {
 
   const removeMember = async (memberId: string) => {
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.removeMember({
+      const result = await authClient.organization.removeMember({
         memberIdOrEmail: memberId,
         organizationId: orgId,
       });
@@ -81,8 +79,7 @@ export const useOrgMembers = (orgId: string) => {
 
   const leaveOrganization = async () => {
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.leave({
+      const result = await authClient.organization.leave({
         organizationId: orgId,
       });
 

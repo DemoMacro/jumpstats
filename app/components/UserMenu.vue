@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 defineProps<{
   collapsed?: boolean;
@@ -35,9 +36,7 @@ async function navigateToAdmin() {
 // Sign out functionality
 async function handleSignOut() {
   try {
-    const { $authClient } = useNuxtApp();
-
-    const { error } = await $authClient.signOut();
+    const { error } = await authClient.signOut();
 
     if (error) {
       toast.add({
@@ -49,7 +48,7 @@ async function handleSignOut() {
     }
 
     // Refresh session after successful sign out
-    await $authClient.getSession();
+    await authClient.getSession();
 
     toast.add({
       title: "Signed Out",

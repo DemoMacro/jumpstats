@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   title: "Profile Settings - Dashboard - JumpStats",
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Get current user session
-const { data: session } = await $authClient.useSession(useFetch);
+const { data: session } = await authClient.useSession(useFetch);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
@@ -54,7 +54,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
   loading.value = true;
   try {
-    const { data, error } = await $authClient.updateUser({
+    const { data, error } = await authClient.updateUser({
       name: event.data.name,
       username: event.data.username || undefined,
       image: event.data.image || undefined,
@@ -70,7 +70,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
     }
 
     // Refresh session after successful update by fetching it again
-    const { data: newSession } = await $authClient.getSession();
+    const { data: newSession } = await authClient.getSession();
     if (newSession) {
       session.value = newSession as typeof session.value;
       // Update profile form with new data

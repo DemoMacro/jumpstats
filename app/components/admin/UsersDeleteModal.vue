@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { UserWithRole } from "better-auth/plugins";
 import * as z from "zod";
+import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
   user: UserWithRole | null;
 }>();
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
@@ -42,7 +42,7 @@ async function deleteUser() {
 
   loading.value = true;
   try {
-    const result = await $authClient.admin.removeUser({
+    const result = await authClient.admin.removeUser({
       userId: props.user.id,
     });
 

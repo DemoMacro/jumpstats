@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const route = useRoute();
 const linkId = route.params.id as string;
@@ -8,7 +9,6 @@ const linkId = route.params.id as string;
 const { link, loading, error, fetchLink } = useLinkDetail(linkId);
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const schema = z.object({
   originalUrl: z.string().url("Please enter a valid URL"),
@@ -43,7 +43,7 @@ const submitting = ref(false);
 async function updateLink(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
-    const result = await $authClient.link.update({
+    const result = await authClient.link.update({
       linkId,
       originalUrl: event.data.originalUrl,
       title: event.data.title || null,

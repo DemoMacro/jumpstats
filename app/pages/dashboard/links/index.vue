@@ -2,6 +2,7 @@
 import type { TableColumn } from "@nuxt/ui";
 import type { Link } from "~~/shared/types/link";
 import { getPaginationRowModel } from "@tanstack/table-core";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -19,7 +20,6 @@ const pagination = ref({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const { copy, copied, isSupported } = useClipboard();
 
@@ -57,7 +57,7 @@ const {
 } = await useAsyncData(
   "links",
   async () => {
-    const result = await $authClient.link.list({
+    const result = await authClient.link.list({
       query: {},
     });
     return result.data;

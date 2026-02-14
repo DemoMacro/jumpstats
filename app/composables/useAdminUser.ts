@@ -1,4 +1,5 @@
 import type { UserWithRole } from "better-auth/plugins/admin";
+import { authClient } from "~/utils/auth";
 
 // Extended type for user updates including password
 interface UserUpdateData extends Partial<UserWithRole> {
@@ -17,8 +18,7 @@ export const useAdminUser = (userId: string) => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.admin.listUsers({
+      const result = await authClient.admin.listUsers({
         query: {
           limit: 1000,
           filterField: "id",
@@ -43,11 +43,9 @@ export const useAdminUser = (userId: string) => {
   const updateUser = async (updates: UserUpdateData) => {
     if (!user.value) return;
 
-    const { $authClient } = useNuxtApp();
-
     // 更新角色
     if (updates.role && updates.role !== user.value.role) {
-      const result = await $authClient.admin.setRole({
+      const result = await authClient.admin.setRole({
         userId: user.value.id,
         role: updates.role as "user" | "admin", // 明确类型转换
       });
@@ -61,7 +59,7 @@ export const useAdminUser = (userId: string) => {
 
     // 更新密码
     if (updates.newPassword) {
-      const result = await $authClient.admin.setUserPassword({
+      const result = await authClient.admin.setUserPassword({
         userId: user.value.id,
         newPassword: updates.newPassword,
       });
@@ -93,7 +91,7 @@ export const useAdminUser = (userId: string) => {
     delete updateData.updatedAt;
 
     if (Object.keys(updateData).length > 0) {
-      const result = await $authClient.admin.updateUser({
+      const result = await authClient.admin.updateUser({
         userId: user.value.id,
         data: updateData,
       });
@@ -112,8 +110,7 @@ export const useAdminUser = (userId: string) => {
   const banUser = async (banReason?: string, banExpiresIn?: number) => {
     if (!user.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.banUser({
+    const result = await authClient.admin.banUser({
       userId: user.value.id,
       banReason: banReason || "Banned by admin",
       banExpiresIn,
@@ -135,8 +132,7 @@ export const useAdminUser = (userId: string) => {
   const unbanUser = async () => {
     if (!user.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.unbanUser({
+    const result = await authClient.admin.unbanUser({
       userId: user.value.id,
     });
 
@@ -154,8 +150,7 @@ export const useAdminUser = (userId: string) => {
   const removeUser = async () => {
     if (!user.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.removeUser({
+    const result = await authClient.admin.removeUser({
       userId: user.value.id,
     });
 
@@ -171,8 +166,7 @@ export const useAdminUser = (userId: string) => {
   const impersonateUser = async () => {
     if (!user.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.impersonateUser({
+    const result = await authClient.admin.impersonateUser({
       userId: user.value.id,
     });
 

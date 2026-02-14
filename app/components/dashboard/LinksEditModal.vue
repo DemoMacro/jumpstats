@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { Link } from "~~/shared/types/link";
+import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
   link: Link | null;
@@ -11,7 +12,6 @@ const emit = defineEmits<{
 }>();
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
@@ -56,7 +56,7 @@ async function updateLink() {
 
   loading.value = true;
   try {
-    const result = await $authClient.link.update({
+    const result = await authClient.link.update({
       linkId: props.link.id,
       originalUrl: state.originalUrl!,
       title: state.title || null,

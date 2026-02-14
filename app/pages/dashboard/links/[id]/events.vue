@@ -3,6 +3,7 @@ import type { TableColumn } from "@nuxt/ui";
 import type { ClickEvent } from "~~/shared/types/analytics";
 import { getPaginationRowModel } from "@tanstack/table-core";
 import { format } from "date-fns";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -51,7 +52,6 @@ const pagination = ref({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Format date for display
 const formatDate = (dateStr: string) => {
@@ -77,7 +77,7 @@ const {
     const start = formatQueryDate(rangeRef.value.start);
     const end = formatQueryDate(rangeRef.value.end);
 
-    const result = await $authClient.link.events({
+    const result = await authClient.link.events({
       query: {
         linkId,
         start,

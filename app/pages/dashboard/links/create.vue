@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -8,7 +9,6 @@ definePageMeta({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const schema = z.object({
   originalUrl: z.string().url("Please enter a valid URL"),
@@ -31,7 +31,7 @@ const submitting = ref(false);
 async function createLink(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
-    const result = await $authClient.link.create({
+    const result = await authClient.link.create({
       originalUrl: event.data.originalUrl,
       title: event.data.title || null,
       description: event.data.description || null,

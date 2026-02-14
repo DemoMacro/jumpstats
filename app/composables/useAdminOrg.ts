@@ -1,4 +1,5 @@
 import type { Organization } from "better-auth/plugins";
+import { authClient } from "~/utils/auth";
 
 // Extended type for organization updates including additional operations
 interface OrganizationUpdateData extends Partial<Organization> {
@@ -18,8 +19,7 @@ export const useAdminOrg = (orgId: string) => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.getFullOrganization({
+      const result = await authClient.organization.getFullOrganization({
         query: { organizationId: orgId },
       });
 
@@ -39,8 +39,6 @@ export const useAdminOrg = (orgId: string) => {
   const updateOrg = async (updates: OrganizationUpdateData) => {
     if (!organization.value) return;
 
-    const { $authClient } = useNuxtApp();
-
     // Build update data with proper field mapping
     const updateData = {
       name: updates.name,
@@ -57,7 +55,7 @@ export const useAdminOrg = (orgId: string) => {
     });
 
     // Use Better-Auth organization update API
-    const result = await $authClient.organization.update({
+    const result = await authClient.organization.update({
       organizationId: organization.value.id,
       data: updateData,
     });
@@ -76,8 +74,7 @@ export const useAdminOrg = (orgId: string) => {
   const deleteOrg = async () => {
     if (!organization.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.organization.delete({
+    const result = await authClient.organization.delete({
       organizationId: organization.value.id,
     });
 
@@ -93,8 +90,7 @@ export const useAdminOrg = (orgId: string) => {
   const setActiveOrg = async () => {
     if (!organization.value) return;
 
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.organization.setActive({
+    const result = await authClient.organization.setActive({
       organizationId: organization.value.id,
     });
 

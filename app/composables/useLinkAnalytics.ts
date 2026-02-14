@@ -1,3 +1,5 @@
+import { authClient } from "~/utils/auth";
+
 type DimensionTab = "devices" | "browsers" | "referers" | "utm";
 type TimeGranularity = "hour" | "day" | "week" | "month";
 
@@ -17,8 +19,6 @@ type DimensionData = {
 };
 
 export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
-  const { $authClient } = useNuxtApp();
-
   // Use external range if provided, otherwise create internal one
   const range =
     externalRange ||
@@ -67,25 +67,25 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         referersResult,
         utmSourcesResult,
       ] = await Promise.all([
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "count", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "timeseries", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "countries", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "devices", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "browsers", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "referers", start, end },
         }),
-        $authClient.link.analytics({
+        authClient.link.analytics({
           query: { linkId, groupBy: "utm_sources", start, end },
         }),
       ]);

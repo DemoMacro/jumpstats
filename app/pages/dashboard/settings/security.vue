@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   title: "Security Settings - Dashboard - JumpStats",
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Get current user session
-const { data: session } = await $authClient.useSession(useFetch);
+const { data: session } = await authClient.useSession(useFetch);
 
 // Password change schema
 const passwordSchema = z
@@ -40,7 +40,7 @@ const passwordLoading = ref(false);
 const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
   passwordLoading.value = true;
   try {
-    const { data, error } = await $authClient.changePassword({
+    const { data, error } = await authClient.changePassword({
       currentPassword: event.data.currentPassword,
       newPassword: event.data.newPassword,
       revokeOtherSessions: event.data.revokeOtherSessions ?? true,
@@ -88,7 +88,7 @@ const sessions = ref<any[]>([]);
 async function fetchSessions() {
   sessionsLoading.value = true;
   try {
-    const { data: sessionsData } = await $authClient.listSessions();
+    const { data: sessionsData } = await authClient.listSessions();
 
     sessions.value = sessionsData || [];
   } catch (error) {
@@ -105,7 +105,7 @@ async function fetchSessions() {
 // Revoke specific session
 async function revokeSession(token: string) {
   try {
-    await $authClient.revokeSession({ token });
+    await authClient.revokeSession({ token });
 
     toast.add({
       title: "Success",
@@ -142,7 +142,7 @@ async function revokeAllOtherSessions() {
     // Revoke all sessions except current one by one
     const revokePromises = sessions.value
       .filter((s) => s.token !== currentSessionToken)
-      .map((s) => $authClient.revokeSession({ token: s.token }));
+      .map((s) => authClient.revokeSession({ token: s.token }));
 
     await Promise.all(revokePromises);
 

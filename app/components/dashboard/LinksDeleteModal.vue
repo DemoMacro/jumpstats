@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Link } from "~~/shared/types/link";
 import * as z from "zod";
+import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
   link: Link | null;
@@ -11,7 +12,6 @@ const emit = defineEmits<{
 }>();
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
@@ -40,7 +40,7 @@ async function deleteLink() {
 
   loading.value = true;
   try {
-    const result = await $authClient.link.delete({
+    const result = await authClient.link.delete({
       linkId: props.link.id,
     });
 

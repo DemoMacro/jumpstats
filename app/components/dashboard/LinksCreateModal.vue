@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { CreateLink } from "~~/shared/types/link";
+import { authClient } from "~/utils/auth";
 
 const emit = defineEmits<{
   refresh: [];
 }>();
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
@@ -29,7 +29,7 @@ const state = reactive<Partial<Schema>>({
 async function createLink() {
   loading.value = true;
   try {
-    const result = await $authClient.link.create({
+    const result = await authClient.link.create({
       originalUrl: state.originalUrl!,
       title: state.title || null,
       description: state.description || null,

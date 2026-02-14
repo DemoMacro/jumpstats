@@ -1,3 +1,5 @@
+import { authClient } from "~/utils/auth";
+
 export const useAdminStats = () => {
   const totalUsers = ref(0);
   const totalOrgs = ref(0);
@@ -11,10 +13,8 @@ export const useAdminStats = () => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-
       // Fetch all users
-      const usersResult = await $authClient.admin.listUsers({
+      const usersResult = await authClient.admin.listUsers({
         query: { limit: 10000 },
       });
 
@@ -24,7 +24,7 @@ export const useAdminStats = () => {
       }
 
       // Fetch all organizations
-      const orgsResult = await $authClient.organization.list();
+      const orgsResult = await authClient.organization.list();
 
       if (orgsResult.data) {
         totalOrgs.value = orgsResult.data.length;
@@ -37,7 +37,7 @@ export const useAdminStats = () => {
 
       for (const user of userSubset) {
         try {
-          const sessionsResult = await $authClient.admin.listUserSessions({
+          const sessionsResult = await authClient.admin.listUserSessions({
             userId: user.id,
           });
           if (sessionsResult.data?.sessions) {

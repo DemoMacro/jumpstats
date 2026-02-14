@@ -2,13 +2,13 @@
 import type { Organization } from "better-auth/plugins";
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
   organization: Organization | null;
 }>();
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 const open = ref(false);
 const loading = ref(false);
@@ -43,7 +43,7 @@ async function deleteOrganization() {
 
   loading.value = true;
   try {
-    const result = await $authClient.organization.delete({
+    const result = await authClient.organization.delete({
       organizationId: props.organization.id,
     });
 

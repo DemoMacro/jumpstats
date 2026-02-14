@@ -152,8 +152,7 @@ async function fetchUserSessions() {
 
   sessionsLoading.value = true;
   try {
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.listUserSessions({
+    const result = await authClient.admin.listUserSessions({
       userId: user.value.id,
     });
 
@@ -197,8 +196,7 @@ async function revokeAllSessions() {
   if (!user.value) return;
 
   try {
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.revokeUserSessions({
+    const result = await authClient.admin.revokeUserSessions({
       userId: user.value.id,
     });
 

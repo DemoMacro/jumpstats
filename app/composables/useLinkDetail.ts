@@ -1,17 +1,16 @@
 import type { Link } from "~~/shared/types/link";
+import { authClient } from "~/utils/auth";
 
 export function useLinkDetail(linkId: string) {
   const link = ref<Link | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const { $authClient } = useNuxtApp();
-
   async function fetchLink() {
     loading.value = true;
     error.value = null;
     try {
-      const result = await $authClient.link.get({
+      const result = await authClient.link.get({
         query: {
           linkId,
         },

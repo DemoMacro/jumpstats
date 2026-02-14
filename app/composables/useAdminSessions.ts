@@ -1,4 +1,5 @@
 import type { Session } from "better-auth";
+import { authClient } from "~/utils/auth";
 
 interface SessionWithUserInfo extends Session {
   userEmail: string;
@@ -16,10 +17,8 @@ export const useAdminSessions = () => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-
       // First get all users
-      const usersResult = await $authClient.admin.listUsers({
+      const usersResult = await authClient.admin.listUsers({
         query: {
           limit: 1000,
           searchValue,
@@ -36,7 +35,7 @@ export const useAdminSessions = () => {
       // Fetch sessions for each user
       for (const user of usersResult.data.users) {
         try {
-          const sessionsResult = await $authClient.admin.listUserSessions({
+          const sessionsResult = await authClient.admin.listUserSessions({
             userId: user.id,
           });
 
@@ -66,8 +65,7 @@ export const useAdminSessions = () => {
   };
 
   const revokeUserSessions = async (userId: string) => {
-    const { $authClient } = useNuxtApp();
-    const result = await $authClient.admin.revokeUserSessions({
+    const result = await authClient.admin.revokeUserSessions({
       userId,
     });
 

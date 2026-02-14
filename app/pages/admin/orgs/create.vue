@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -8,7 +9,6 @@ definePageMeta({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Form schema
 const schema = z.object({
@@ -72,7 +72,7 @@ watch(
 async function createOrganization(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
-    const result = await $authClient.organization.create({
+    const result = await authClient.organization.create({
       name: event.data.name,
       slug: event.data.slug,
     });

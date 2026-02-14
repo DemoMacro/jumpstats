@@ -2,6 +2,7 @@
 import type { UserWithRole } from "better-auth/plugins";
 import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
@@ -31,13 +32,12 @@ const pagination = ref({
 });
 
 const toast = useToast();
-const { $authClient } = useNuxtApp();
 
 // Fetch users
 async function fetchUsers() {
   loading.value = true;
   try {
-    const result = await $authClient.admin.listUsers({
+    const result = await authClient.admin.listUsers({
       query: {
         limit: pagination.value.pageSize,
         offset: pagination.value.pageIndex * pagination.value.pageSize,

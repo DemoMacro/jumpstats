@@ -1,4 +1,5 @@
 import type { Organization } from "better-auth/plugins";
+import { authClient } from "~/utils/auth";
 
 // Extended type for organization creation
 interface OrganizationCreateData {
@@ -21,12 +22,10 @@ export const useAdminOrganizations = () => {
     error.value = null;
 
     try {
-      const { $authClient } = useNuxtApp();
-
       // Better-Auth doesn't have a direct admin list organizations endpoint
       // We'll use the regular list method which returns orgs for the current user
       // For admin purposes, you might need to implement a custom server endpoint
-      const result = await $authClient.organization.list();
+      const result = await authClient.organization.list();
 
       if (result.data) {
         organizations.value = result.data;
@@ -42,8 +41,7 @@ export const useAdminOrganizations = () => {
 
   const createOrganization = async (data: OrganizationCreateData) => {
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.create(data);
+      const result = await authClient.organization.create(data);
 
       if (result.error) {
         throw new Error(result.error.message || "Failed to create organization");
@@ -60,8 +58,7 @@ export const useAdminOrganizations = () => {
 
   const deleteOrganization = async (organizationId: string) => {
     try {
-      const { $authClient } = useNuxtApp();
-      const result = await $authClient.organization.delete({
+      const result = await authClient.organization.delete({
         organizationId,
       });
 
