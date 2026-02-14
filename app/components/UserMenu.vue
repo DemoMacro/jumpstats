@@ -56,7 +56,7 @@ async function handleSignOut() {
       color: "success",
     });
 
-    await navigateTo("/auth/sign-in");
+    await navigateTo("/");
   } catch (error) {
     toast.add({
       title: "Sign Out Error",

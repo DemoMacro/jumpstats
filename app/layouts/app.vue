@@ -16,16 +16,13 @@ const items = computed<NavigationMenuItem[]>(() => {
       active: route.path === "/",
       icon: "i-lucide-house",
     },
-  ];
-
-  if (session.value?.user) {
-    baseItems.push({
+    {
       label: "Dashboard",
       to: "/dashboard",
       active: route.path.startsWith("/dashboard"),
       icon: "i-lucide-layout-dashboard",
-    });
-  }
+    },
+  ];
 
   return baseItems;
 });
@@ -64,7 +61,7 @@ const items = computed<NavigationMenuItem[]>(() => {
       <NuxtPage />
     </UMain>
 
-    <USeparator icon="i-simple-icons-nuxtdotjs" />
+    <USeparator />
 
     <UFooter>
       <template #left>
