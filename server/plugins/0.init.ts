@@ -1,14 +1,66 @@
 import { chdbClient } from "~~/server/utils/database";
 import { getMigrations } from "better-auth/db/migration";
 import { authConfig } from "~~/server/utils/auth";
+import { db } from "~~/server/utils/database";
 
 export default defineNitroPlugin(async () => {
   setTimeout(async () => {
+    // ==========================================
+    // 1. Run Better Auth database migrations
+    // ==========================================
     try {
-      // ==========================================
-      // 1. Initialize ClickHouse database for analytics
-      // ==========================================
+      const { toBeCreated, toBeAdded, runMigrations } = await getMigrations(authConfig);
 
+      // Check what migrations are needed
+      if (toBeCreated.length > 0 || toBeAdded.length > 0) {
+        console.log("📋 Better Auth Migrations Required:");
+        console.log(
+          "   Tables to create:",
+          toBeCreated.map((t) => t.table),
+        );
+        console.log(
+          "   Fields to add:",
+          toBeAdded.map((t) => t.table),
+        );
+
+        // Run migrations
+        await runMigrations();
+        console.log("✅ Better Auth migrations completed successfully");
+      } else {
+        console.log("✅ Better Auth database schema is up to date");
+      }
+
+      // Optional: Log SQL for debugging
+      // const sql = await compileMigrations();
+      // console.log("Migration SQL:", sql);
+    } catch (error) {
+      console.error("❌ Failed to run Better Auth migrations:", error);
+    }
+
+    // ==========================================
+    // 2. Add composite unique constraint for link table
+    // ==========================================
+    try {
+      // Add composite unique constraint on domainId + shortCode
+      await db.schema
+        .alterTable("link")
+        .addUniqueConstraint("link_domainId_shortCode_unique", ["domainId", "shortCode"])
+        .execute();
+
+      console.log("✅ Added composite unique constraint on (domainId, shortCode)");
+    } catch (error) {
+      // If constraint already exists, that's fine
+      if (String(error).includes("already exists")) {
+        console.log("✅ Composite unique constraint already exists");
+      } else {
+        console.error("❌ Failed to add composite unique constraint:", error);
+      }
+    }
+
+    // ==========================================
+    // 3. Initialize ClickHouse database for analytics
+    // ==========================================
+    try {
       // Create database if not exists
       await chdbClient.command({
         query: `CREATE DATABASE IF NOT EXISTS jumpstats`,
@@ -94,38 +146,6 @@ export default defineNitroPlugin(async () => {
       console.log("✅ ClickHouse database and tables initialized successfully");
     } catch (error) {
       console.error("❌ Failed to initialize ClickHouse:", error);
-    }
-
-    // ==========================================
-    // 2. Run Better Auth database migrations
-    // ==========================================
-    try {
-      const { toBeCreated, toBeAdded, runMigrations } = await getMigrations(authConfig);
-
-      // Check what migrations are needed
-      if (toBeCreated.length > 0 || toBeAdded.length > 0) {
-        console.log("📋 Better Auth Migrations Required:");
-        console.log(
-          "   Tables to create:",
-          toBeCreated.map((t) => t.table),
-        );
-        console.log(
-          "   Fields to add:",
-          toBeAdded.map((t) => t.table),
-        );
-
-        // Run migrations
-        await runMigrations();
-        console.log("✅ Better Auth migrations completed successfully");
-      } else {
-        console.log("✅ Better Auth database schema is up to date");
-      }
-
-      // Optional: Log SQL for debugging
-      // const sql = await compileMigrations();
-      // console.log("Migration SQL:", sql);
-    } catch (error) {
-      console.error("❌ Failed to run Better Auth migrations:", error);
     }
   }, 1000);
 });

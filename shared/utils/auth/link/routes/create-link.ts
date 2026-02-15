@@ -120,7 +120,7 @@ export const createLink = () => {
       }
 
       // Generate unique short code
-      const shortCode = await generateUniqueShortCode(ctx);
+      const shortCode = await generateUniqueShortCode(ctx, domainId || null);
 
       const newLink = {
         shortCode,
@@ -185,6 +185,7 @@ export const createLink = () => {
  */
 async function generateUniqueShortCode(
   ctx: GenericEndpointContext,
+  domainId: string | null,
   length = 6,
   maxRetries = 10,
 ): Promise<string> {
@@ -193,13 +194,18 @@ async function generateUniqueShortCode(
   for (let i = 0; i < maxRetries; i++) {
     const shortCode = randomBytes(length).toString("base64url").substring(0, length);
 
-    // Check if already exists
+    // Check if shortCode already exists for the same domainId
+    // The uniqueness is now (domainId + shortCode) composite
     const existing = await ctx.context.adapter.findOne<Link>({
       model: "link",
       where: [
         {
           field: "shortCode",
           value: shortCode,
+        },
+        {
+          field: "domainId",
+          value: domainId,
         },
       ],
     });

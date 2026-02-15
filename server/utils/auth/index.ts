@@ -20,7 +20,7 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [username(), admin(), apiKey(), organization(), openAPI(), link(), domain()],
+  plugins: [username(), admin(), apiKey(), organization(), openAPI(), domain(), link()],
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth(authConfig);

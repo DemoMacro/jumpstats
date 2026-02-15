@@ -26,7 +26,6 @@ export const link = () => {
           shortCode: {
             type: "string",
             required: true,
-            unique: true,
             index: true,
           },
           originalUrl: {
