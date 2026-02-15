@@ -60,5 +60,8 @@
     "uqr": "0.1.2",
     "vue-tsc": "3.2.4",
     "zod": "4.3.6"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@latest"
   }
 }
