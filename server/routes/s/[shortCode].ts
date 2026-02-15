@@ -19,46 +19,48 @@ export default defineEventHandler(async (event) => {
   // Try to get link from cache first
   let link = await getLink(shortCode, host);
 
-  // Cache miss - query database
+  // Cache miss - query database with LEFT JOIN
   if (!link) {
-    const dbLink = await db
+    // Single query with LEFT JOIN to get both link and domain data
+    const result = await db
       .selectFrom("link")
-      .selectAll()
-      .where("shortCode", "=", shortCode)
+      .leftJoin("domain", "domain.id", "link.domainId")
+      .selectAll("link")
+      .select(["domain.domainName", "domain.status as domainStatus"])
+      .where("link.shortCode", "=", shortCode)
       .executeTakeFirst();
 
-    if (!dbLink) {
+    if (!result) {
       throw createError({
         statusCode: 404,
         statusMessage: "Short link not found",
       });
     }
 
-    // Get the correct domainName for caching
-    let domainName = host; // Default to requested host
+    // Extract domainName, domainStatus (use host if null) and link data
+    const { domainName, domainStatus, ...linkData } = result;
+    const finalDomainName = domainName ?? host;
 
-    // If link has custom domain, query and get domainName
-    if (dbLink.domainId) {
-      const domain = await db
-        .selectFrom("domain")
-        .select("domainName")
-        .where("id", "=", dbLink.domainId)
-        .executeTakeFirst();
-
-      if (!domain) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Custom domain not found",
-        });
-      }
-
-      domainName = domain.domainName;
+    // If link has custom domain but domainName is null, domain not found
+    if (linkData.domainId && !domainName) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Custom domain not found",
+      });
     }
 
-    // Set link to cache with correct domainName
-    await setLink(shortCode, domainName, dbLink);
+    // If link has custom domain, verify domain is active
+    if (linkData.domainId && domainStatus !== "active") {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Custom domain not verified or not found",
+      });
+    }
 
-    link = { ...dbLink, domainName };
+    // Set link to cache with domainName
+    await setLink(shortCode, finalDomainName, linkData as Link);
+
+    link = { ...linkData, domainName: finalDomainName };
   }
 
   // Validate link status
@@ -77,30 +79,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // If link has custom domain, verify it matches requested host
-  if (link.domainId) {
-    // Use cached domainName if available
-    const domainName = link.domainName;
-
-    // Verify the domain is active
-    const domain = await db
-      .selectFrom("domain")
-      .selectAll()
-      .where("domainName", "=", domainName)
-      .executeTakeFirst();
-
-    if (!domain || domain.status !== "active") {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Custom domain not verified or not found",
-      });
-    }
-
-    if (host !== domainName) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Domain does not match requested host",
-      });
-    }
+  if (link.domainId && link.domainName !== host) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Domain does not match requested host",
+    });
   }
 
   // Track click event in background (non-blocking)

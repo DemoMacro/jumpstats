@@ -1,4 +1,4 @@
-import { createStorage } from "unstorage";
+import { createStorage, prefixStorage } from "unstorage";
 import redisDriver from "unstorage/drivers/redis";
 import memoryDriver from "unstorage/drivers/memory";
 import fsDriver from "unstorage/drivers/fs";
@@ -11,15 +11,19 @@ import { isDevelopment, env } from "std-env";
  * - Fallback: Uses memory otherwise
  */
 
-// Cache storage: Filesystem (dev) / Redis (prod) / Memory (fallback)
-export const cacheStorage = createStorage({
-  driver: isDevelopment
-    ? fsDriver({
-        base: "./.nitro/cache",
-      })
-    : env.REDIS_URL
-      ? redisDriver({
-          url: env.REDIS_URL,
+// Cache storage with global namespace prefix
+// Keys will be stored as: jumpstats:cache:link:domain:shortCode
+export const cacheStorage = prefixStorage(
+  createStorage({
+    driver: isDevelopment
+      ? fsDriver({
+          base: "./.nitro/cache",
         })
-      : memoryDriver(),
-});
+      : env.REDIS_URL
+        ? redisDriver({
+            url: env.REDIS_URL,
+          })
+        : memoryDriver(),
+  }),
+  "jumpstats:cache",
+);
