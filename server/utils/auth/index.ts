@@ -21,6 +21,11 @@ export const authConfig = {
     enabled: true,
   },
   plugins: [username(), admin(), apiKey(), organization(), openAPI(), domain(), link()],
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth(authConfig);

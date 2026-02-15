@@ -11,6 +11,12 @@ export default defineNuxtConfig({
     "/api/**": {
       cors: true,
     },
+    "/admin/**": {
+      ssr: false,
+    },
+    "/dashboard/**": {
+      ssr: false,
+    },
     "/sw.js": {
       ssr: false,
     },
