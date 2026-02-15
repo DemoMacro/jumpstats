@@ -60,6 +60,17 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         });
 
     if (error) {
+      // Handle email verification required error (403)
+      if (error.status === 403) {
+        toast.add({
+          title: "Email Verification Required",
+          description:
+            "Please verify your email address. We've sent a verification link to your email.",
+          color: "warning",
+        });
+        return;
+      }
+
       toast.add({
         title: "Sign In Error",
         description: error.message || "Invalid credentials",
@@ -114,9 +125,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </template>
 
         <template #password-hint>
-          <ULink to="/auth/forgot-password" class="text-primary font-medium">
-            Forgot password?
-          </ULink>
+          <div class="flex justify-between w-full">
+            <ULink to="/auth/forgot-password" class="text-primary font-medium">
+              Forgot password?
+            </ULink>
+            <ULink to="/auth/verify-email" class="text-primary font-medium">
+              Resend verification
+            </ULink>
+          </div>
         </template>
 
         <template #validation>

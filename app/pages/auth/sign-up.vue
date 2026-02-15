@@ -90,7 +90,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     toast.add({
       title: "Account Created!",
-      description: "Your account has been created successfully",
+      description:
+        "Please check your email and click the verification link to activate your account.",
       color: "success",
     });
 

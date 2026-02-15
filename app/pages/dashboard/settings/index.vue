@@ -54,6 +54,35 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
   loading.value = true;
   try {
+    // Check if email is being changed
+    const emailChanged = event.data.email !== session.value.user.email;
+
+    // If email changed, initiate email change flow
+    if (emailChanged) {
+      const { error } = await authClient.changeEmail({
+        newEmail: event.data.email,
+        callbackURL: "/dashboard/settings",
+      });
+
+      if (error) {
+        toast.add({
+          title: "Error",
+          description: error.message || "Failed to change email",
+          color: "error",
+        });
+        return;
+      }
+
+      toast.add({
+        title: "Email Change Initiated",
+        description: "Please check your current and new email for verification links",
+        icon: "i-lucide-mail",
+        color: "success",
+      });
+      return;
+    }
+
+    // Update other profile fields
     const { data, error } = await authClient.updateUser({
       name: event.data.name,
       username: event.data.username || undefined,
@@ -156,11 +185,11 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <UFormField
           name="email"
           label="Email"
-          description="This is your email address."
+          description="Changing your email will require verification."
           required
           class="flex max-sm:flex-col justify-between items-start gap-4"
         >
-          <UInput v-model="profile.email" type="email" disabled />
+          <UInput v-model="profile.email" type="email" />
         </UFormField>
         <USeparator />
         <UFormField
