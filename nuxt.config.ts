@@ -1,7 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 
 export default defineNuxtConfig({
-  ssr: true,
+  ssr: false,
 
   typescript: {
     typeCheck: true,
@@ -11,14 +11,11 @@ export default defineNuxtConfig({
     "/api/**": {
       cors: true,
     },
-    "/admin/**": {
-      ssr: false,
-    },
-    "/dashboard/**": {
-      ssr: false,
-    },
-    "/sw.js": {
-      ssr: false,
+  },
+
+  nitro: {
+    prerender: {
+      routes: ["/", "/privacy", "/terms"],
     },
   },
 
