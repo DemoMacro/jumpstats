@@ -120,11 +120,6 @@ watch(error, (newError) => {
         </template>
 
         <UPageGrid class="sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <UButton to="/dashboard/links" variant="outline" class="justify-start">
-            <UIcon name="i-lucide-list" class="mr-2" />
-            View All Links
-          </UButton>
-
           <UButton to="/dashboard/links/create" variant="outline" class="justify-start">
             <UIcon name="i-lucide-plus" class="mr-2" />
             Create Link
@@ -137,7 +132,7 @@ watch(error, (newError) => {
         </UPageGrid>
       </UPageCard>
 
-      <UCard :ui="{ body: 'px-0 sm:px-0' }">
+      <UCard :ui="{ body: 'px-0 py-3 sm:px-0 sm:py-3' }">
         <template #header>
           <div class="flex items-center justify-between">
             <div>
@@ -169,7 +164,7 @@ watch(error, (newError) => {
         <div v-else>
           <template v-for="(link, index) in recentLinks" :key="link.id">
             <div
-              class="flex items-center justify-between gap-4 px-6 hover:bg-muted/50 transition-colors w-full"
+              class="flex items-center justify-between gap-4 px-6 py-3 hover:bg-muted/50 transition-colors w-full"
             >
               <NuxtLink
                 :to="`${getLinkDomain(link)}/s/${link.shortCode}`"
