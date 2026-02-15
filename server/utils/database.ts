@@ -8,9 +8,10 @@ import {
 } from "@hypequery/clickhouse";
 import type { Database } from "~~/shared/types/database";
 import type { AnalyticsSchema } from "~~/shared/types/analytics";
+import { env } from "std-env";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: env.DATABASE_URL,
 });
 
 export const db = new Kysely<Database>({
@@ -18,10 +19,10 @@ export const db = new Kysely<Database>({
 });
 
 const chdbConfig: ClickHouseConfig = {
-  url: process.env.CLICKHOUSE_URL!,
-  database: process.env.CLICKHOUSE_DATABASE!,
-  username: process.env.CLICKHOUSE_USERNAME!,
-  password: process.env.CLICKHOUSE_PASSWORD!,
+  url: env.CLICKHOUSE_URL!,
+  database: env.CLICKHOUSE_DATABASE!,
+  username: env.CLICKHOUSE_USERNAME!,
+  password: env.CLICKHOUSE_PASSWORD!,
 };
 
 // Configure hypequery logger to only show warnings and errors
@@ -41,7 +42,7 @@ const tempClient = ClickHouseConnection.getClient();
 // Create database if not exists
 tempClient
   .command({
-    query: `CREATE DATABASE IF NOT EXISTS ${process.env.CLICKHOUSE_DATABASE}`,
+    query: `CREATE DATABASE IF NOT EXISTS ${env.CLICKHOUSE_DATABASE}`,
   })
   .catch((err: unknown) => {
     console.error("Failed to create ClickHouse database:", err);

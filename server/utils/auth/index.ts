@@ -3,12 +3,13 @@ import { username, admin, apiKey, organization, openAPI } from "better-auth/plug
 import { Pool } from "pg";
 import { link } from "../../../shared/utils/auth/link";
 import { domain } from "../../../shared/utils/auth/domain";
+import { env } from "std-env";
 
 export const authConfig = {
   basePath: "/api",
   database: new Pool({
     // connection options
-    connectionString: process.env.DATABASE_URL,
+    connectionString: env.DATABASE_URL,
   }),
   advanced: {
     database: {

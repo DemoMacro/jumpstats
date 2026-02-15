@@ -1,4 +1,5 @@
 import { auth } from "./index";
+import { env } from "std-env";
 
 /**
  * Initialize default admin user using admin plugin
@@ -46,8 +47,8 @@ export async function createAdminUser(options: {
  * In production, these should come from environment variables
  */
 export const defaultAdminConfig = {
-  email: process.env.ADMIN_EMAIL || "admin@js.gs",
-  name: process.env.ADMIN_NAME || "System Administrator",
-  username: process.env.ADMIN_USERNAME || "admin",
-  password: process.env.ADMIN_PASSWORD || "admin123456",
+  email: env.ADMIN_EMAIL || "admin@js.gs",
+  name: env.ADMIN_NAME || "System Administrator",
+  username: env.ADMIN_USERNAME || "admin",
+  password: env.ADMIN_PASSWORD || "admin123456",
 };
