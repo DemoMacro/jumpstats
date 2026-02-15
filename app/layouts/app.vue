@@ -68,6 +68,14 @@ const items = computed<NavigationMenuItem[]>(() => {
         <p class="text-sm text-muted-foreground">JumpStats • {{ new Date().getFullYear() }}</p>
       </template>
 
+      <UNavigationMenu
+        :items="[
+          { label: 'Privacy Policy', to: '/privacy' },
+          { label: 'Terms of Service', to: '/terms' },
+        ]"
+        variant="link"
+      />
+
       <template #right>
         <UButton
           to="https://github.com/DemoMacro/JumpStats"

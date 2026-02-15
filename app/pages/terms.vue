@@ -44,13 +44,6 @@ if (terms.value) {
       <div class="max-w-4xl mx-auto">
         <ContentRenderer v-if="terms" :value="terms" />
       </div>
-
-      <!-- Back to Home -->
-      <div class="mt-8 text-center">
-        <UButton to="/" icon="i-lucide-arrow-left" variant="outline" color="neutral">
-          Back to Home
-        </UButton>
-      </div>
     </UContainer>
   </div>
 </template>

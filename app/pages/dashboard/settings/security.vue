@@ -332,5 +332,19 @@ onMounted(() => {
         </UCard>
       </div>
     </UPageCard>
+
+    <!-- Delete Account Section -->
+    <UPageCard
+      title="Delete Account"
+      description="Permanently delete your account and all associated data."
+      variant="subtle"
+      class="mt-6"
+    >
+      <DashboardDeleteAccountModal>
+        <div class="flex justify-end pt-4">
+          <UButton color="error"> Delete Account </UButton>
+        </div>
+      </DashboardDeleteAccountModal>
+    </UPageCard>
   </div>
 </template>
