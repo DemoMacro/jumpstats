@@ -5,10 +5,12 @@ export default defineContentConfig({
     content_en: defineCollection({
       type: "page",
       source: "en/*.md",
+      prefix: "/",
     }),
     content_zh_cn: defineCollection({
       type: "page",
       source: "zh_cn/*.md",
+      prefix: "/",
     }),
   },
 });

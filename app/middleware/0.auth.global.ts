@@ -15,18 +15,19 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  // Skip middleware for public routes like landing page
-  if (to.path === "/") {
-    return;
-  }
-
   // If user is authenticated and trying to access auth pages, redirect to dashboard
   if (session.value?.user && to.path.startsWith("/auth/")) {
     return navigateTo("/dashboard");
   }
 
+  // Define protected routes that require authentication
+  const protectedRoutes = ["/dashboard", "/admin"];
+
+  // Check if current path starts with any protected route
+  const isProtectedRoute = protectedRoutes.some((route) => to.path.startsWith(route));
+
   // If user is not authenticated and trying to access protected routes, redirect to sign-in
-  if (!session.value?.user && !to.path.startsWith("/auth/")) {
+  if (!session.value?.user && isProtectedRoute) {
     return navigateTo("/auth/sign-in");
   }
 });
