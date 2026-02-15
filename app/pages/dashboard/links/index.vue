@@ -248,14 +248,14 @@ const columns: TableColumn<Link>[] = [
                   </template>
                 </UPopover>
 
-                <DashboardLinksDeleteModal :link="row.original" @refresh="fetchLinks">
+                <DashboardLinkDeleteModal :link="row.original" @refresh="fetchLinks">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
                     title="Delete Link"
                   />
-                </DashboardLinksDeleteModal>
+                </DashboardLinkDeleteModal>
               </div>
             </template>
           </UTable>

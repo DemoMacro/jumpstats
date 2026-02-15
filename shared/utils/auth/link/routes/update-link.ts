@@ -1,6 +1,6 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
-import { UpdateLinkBodySchema, type Link } from "../../../../types/link";
+import { UpdateLinkSchema, type Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
 import type { Domain } from "../../../../types/domain";
 import { canAccessDomain } from "../../domain/permissions";
@@ -11,7 +11,7 @@ export const updateLink = () => {
     "/link/update",
     {
       method: "POST",
-      body: UpdateLinkBodySchema,
+      body: UpdateLinkSchema,
       use: [sessionMiddleware],
       metadata: {
         openapi: {
@@ -39,15 +39,15 @@ export const updateLink = () => {
         });
       }
 
-      const { linkId, ...updateData } = ctx.body;
+      const { id, ...updateData } = ctx.body;
 
-      // Get the link
+      // Get the link first to check permissions
       const link = await ctx.context.adapter.findOne<Link>({
         model: "link",
         where: [
           {
             field: "id",
-            value: linkId,
+            value: id,
           },
         ],
       });
@@ -116,7 +116,7 @@ export const updateLink = () => {
         where: [
           {
             field: "id",
-            value: linkId,
+            value: id,
           },
         ],
         update: {

@@ -218,7 +218,7 @@ const columns: TableColumn<Domain>[] = [
                         </div>
                         <div class="flex items-center gap-2">
                           <span class="text-sm font-medium">Value:</span>
-                          <span class="text-sm font-mono text-xs break-all">
+                          <span class="text-sm font-mono break-all">
                             {{ row.original.verificationToken }}
                           </span>
                         </div>

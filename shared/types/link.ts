@@ -23,23 +23,20 @@ export const CreateLinkSchema = LinkSchema.pick({
   organizationId: true,
   title: true,
   description: true,
+  status: true,
   expiresAt: true,
 }).partial({
   domainId: true,
   organizationId: true,
   title: true,
   description: true,
+  status: true,
   expiresAt: true,
 });
 
-export const UpdateLinkSchema = LinkSchema.pick({
-  originalUrl: true,
-  domainId: true,
-  title: true,
-  description: true,
-  status: true,
-  expiresAt: true,
-}).partial();
+export const UpdateLinkSchema = CreateLinkSchema.extend({
+  id: z.uuid(),
+});
 
 export const LinkQuerySchema = z.object({
   linkId: z.uuid().optional(),
@@ -50,12 +47,7 @@ export const LinkQuerySchema = z.object({
   status: LinkStatusSchema.optional(),
 });
 
-export const UpdateLinkBodySchema = UpdateLinkSchema.extend({
-  linkId: z.uuid().meta({ description: "The ID of the link to update" }),
-});
-
 export type Link = z.infer<typeof LinkSchema>;
 export type CreateLink = z.infer<typeof CreateLinkSchema>;
 export type UpdateLink = z.infer<typeof UpdateLinkSchema>;
 export type LinkStatus = z.infer<typeof LinkStatusSchema>;
-export type UpdateLinkBody = z.infer<typeof UpdateLinkBodySchema>;
