@@ -38,10 +38,23 @@ export function useDomains() {
 
   // Convert domains to select options format
   const domainOptions = computed<DomainOption[]>(() => {
-    return domains.value.map((domain) => ({
-      label: domain.domainName,
-      value: domain.id,
-    }));
+    // Add default option (no custom domain)
+    const options: DomainOption[] = [
+      {
+        label: "Default",
+        value: "default",
+      },
+    ];
+
+    // Add custom domains
+    domains.value.forEach((domain) => {
+      options.push({
+        label: domain.domainName,
+        value: domain.id,
+      });
+    });
+
+    return options;
   });
 
   // Auto-fetch on mount

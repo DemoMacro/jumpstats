@@ -35,7 +35,7 @@ watch(
   (newLink) => {
     if (newLink) {
       state.originalUrl = newLink.originalUrl;
-      state.domainId = newLink.domainId || undefined;
+      state.domainId = newLink.domainId || "default";
       state.title = newLink.title;
       state.description = newLink.description;
       state.status = newLink.status;
@@ -51,7 +51,7 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
     const result = await authClient.link.update({
       linkId,
       originalUrl: event.data.originalUrl!,
-      domainId: event.data.domainId || null,
+      domainId: event.data.domainId === "default" ? null : event.data.domainId || null,
       title: event.data.title || null,
       description: event.data.description || null,
       status: event.data.status,
@@ -141,7 +141,7 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
             v-if="domainOptions.length > 0"
             v-model="state.domainId"
             :items="domainOptions"
-            placeholder="Use default domain"
+            placeholder="Default"
             icon="i-lucide-globe"
             :disabled="submitting || domainsLoading"
             class="w-48"

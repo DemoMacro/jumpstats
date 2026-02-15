@@ -5,6 +5,7 @@ import type { GenericEndpointContext } from "better-auth";
 import type { Member } from "better-auth/plugins";
 import type { Domain } from "../../../../types/domain";
 import { canAccessDomain } from "../../domain/permissions";
+import { setLink } from "../cache";
 
 export const createLink = () => {
   return createAuthEndpoint(
@@ -138,6 +139,31 @@ export const createLink = () => {
       const link = await ctx.context.adapter.create<typeof newLink & { id: string }>({
         model: "link",
         data: newLink,
+      });
+
+      // Set cache for the newly created link
+      let domainName: string;
+      if (domainId) {
+        // Already validated domain above, use its domainName
+        const domain = await ctx.context.adapter.findOne<Domain>({
+          model: "domain",
+          where: [
+            {
+              field: "id",
+              value: domainId,
+            },
+          ],
+        });
+        domainName = domain!.domainName;
+      } else {
+        // Use default domain name from baseURL
+        const baseURL = ctx.context.baseURL;
+        domainName = new URL(baseURL).hostname;
+      }
+
+      // Set link to cache (non-blocking, don't await)
+      setLink(shortCode, domainName, link).catch((error) => {
+        console.error("Failed to set link cache:", error);
       });
 
       // Construct full URLs

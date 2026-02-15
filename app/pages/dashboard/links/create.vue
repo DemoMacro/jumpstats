@@ -25,7 +25,7 @@ type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   originalUrl: undefined,
-  domainId: undefined,
+  domainId: "default",
   title: undefined,
   description: undefined,
   expiresAt: undefined,
@@ -38,7 +38,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
   try {
     const result = await authClient.link.create({
       originalUrl: event.data.originalUrl!,
-      domainId: event.data.domainId || null,
+      domainId: event.data.domainId === "default" ? null : event.data.domainId || null,
       title: event.data.title || null,
       description: event.data.description || null,
       expiresAt: event.data.expiresAt ? new Date(event.data.expiresAt) : null,
@@ -138,7 +138,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
                 v-if="domainOptions.length > 0"
                 v-model="state.domainId"
                 :items="domainOptions"
-                placeholder="Use default domain"
+                placeholder="Default"
                 icon="i-lucide-globe"
                 :disabled="submitting || domainsLoading"
                 class="w-48"

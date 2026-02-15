@@ -4,6 +4,7 @@ import { UpdateLinkBodySchema, type Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
 import type { Domain } from "../../../../types/domain";
 import { canAccessDomain } from "../../domain/permissions";
+import { setLink, removeLink } from "../cache";
 
 export const updateLink = () => {
   return createAuthEndpoint(
@@ -129,6 +130,53 @@ export const updateLink = () => {
           message: "Link not found",
         });
       }
+
+      // Update cache
+      // Get old domainName for removing old cache
+      let oldDomainName: string;
+      if (link.domainId) {
+        const oldDomain = await ctx.context.adapter.findOne<Domain>({
+          model: "domain",
+          where: [
+            {
+              field: "id",
+              value: link.domainId,
+            },
+          ],
+        });
+        oldDomainName = oldDomain?.domainName || new URL(ctx.context.baseURL).hostname;
+      } else {
+        oldDomainName = new URL(ctx.context.baseURL).hostname;
+      }
+
+      // Get new domainName for setting new cache
+      let newDomainName: string;
+      if (updatedLink.domainId) {
+        const newDomain = await ctx.context.adapter.findOne<Domain>({
+          model: "domain",
+          where: [
+            {
+              field: "id",
+              value: updatedLink.domainId,
+            },
+          ],
+        });
+        newDomainName = newDomain?.domainName || new URL(ctx.context.baseURL).hostname;
+      } else {
+        newDomainName = new URL(ctx.context.baseURL).hostname;
+      }
+
+      // If domainId changed, remove old cache
+      if (oldDomainName !== newDomainName) {
+        removeLink(link.shortCode, oldDomainName).catch((error) => {
+          console.error("Failed to remove old link cache:", error);
+        });
+      }
+
+      // Set new cache (non-blocking, don't await)
+      setLink(updatedLink.shortCode, newDomainName, updatedLink).catch((error) => {
+        console.error("Failed to set link cache:", error);
+      });
 
       // Construct full URLs
       const baseURL = ctx.context.baseURL;

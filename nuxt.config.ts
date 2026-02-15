@@ -20,7 +20,14 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/ui", "@vueuse/nuxt", "@nuxtjs/i18n", "@nuxt/content", "nuxt-mcp-dev"],
+  nitro: {
+    prerender: {
+      // Pre-render the homepage
+      routes: ["/"],
+    },
+  },
+
+  modules: ["@nuxt/ui", "@vueuse/nuxt", "@nuxtjs/i18n", "@nuxt/content"],
 
   css: ["~/assets/css/main.css"],
 
@@ -48,5 +55,8 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       cookieCrossOrigin: true,
     },
+    strategy: "no_prefix",
+    skipSettingLocaleOnNavigate: false,
+    differentDomains: false,
   },
 });
