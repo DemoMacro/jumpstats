@@ -26,6 +26,7 @@ export const chdbConfig: ClickHouseConfig = {
 
 // ClickHouse connection will be initialized in the plugin
 // Lazy load the client - only get it when actually used
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 let chdbClientInstance: ReturnType<typeof ClickHouseConnection.getClient> | null = null;
 
 export const getChdbClient = () => {
