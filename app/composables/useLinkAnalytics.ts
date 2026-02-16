@@ -1,6 +1,6 @@
 import { authClient } from "~/utils/auth";
 
-type DimensionTab = "devices" | "browsers" | "referers" | "utm";
+type DimensionTab = "devices" | "browsers" | "os" | "referers" | "utm_sources";
 type TimeGranularity = "hour" | "day" | "week" | "month";
 
 interface Range {
@@ -34,6 +34,7 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
   const countries = ref<DimensionData[]>([]);
   const devices = ref<DimensionData[]>([]);
   const browsers = ref<DimensionData[]>([]);
+  const os = ref<DimensionData[]>([]);
   const referers = ref<DimensionData[]>([]);
   const utmSources = ref<DimensionData[]>([]);
 
@@ -64,6 +65,7 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         countriesResult,
         devicesResult,
         browsersResult,
+        osResult,
         referersResult,
         utmSourcesResult,
       ] = await Promise.all([
@@ -81,6 +83,9 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         }),
         authClient.link.analytics({
           query: { linkId, groupBy: "browsers", start, end },
+        }),
+        authClient.link.analytics({
+          query: { linkId, groupBy: "os", start, end },
         }),
         authClient.link.analytics({
           query: { linkId, groupBy: "referers", start, end },
@@ -115,6 +120,11 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
       // Handle browsers
       if (browsersResult.data && "data" in browsersResult.data) {
         browsers.value = (browsersResult.data as { data: DimensionData[] }).data;
+      }
+
+      // Handle OS
+      if (osResult.data && "data" in osResult.data) {
+        os.value = (osResult.data as { data: DimensionData[] }).data;
       }
 
       // Handle referers
@@ -284,9 +294,11 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         return devices.value;
       case "browsers":
         return browsers.value;
+      case "os":
+        return os.value;
       case "referers":
         return referers.value;
-      case "utm":
+      case "utm_sources":
         return utmSources.value;
     }
   });
@@ -297,9 +309,11 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         return "deviceType";
       case "browsers":
         return "browserName";
+      case "os":
+        return "osName";
       case "referers":
         return "referrer";
-      case "utm":
+      case "utm_sources":
         return "utmSource";
     }
   });
@@ -320,6 +334,7 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
     countries,
     devices,
     browsers,
+    os,
     referers,
     utmSources,
     totalClicks,

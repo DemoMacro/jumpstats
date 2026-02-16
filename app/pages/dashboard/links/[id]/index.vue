@@ -271,25 +271,36 @@ const getPercentage = (item: AnalyticsRecord) => {
                 :variant="activeTab === 'devices' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-smartphone"
+                title="Devices"
                 @click="setTab('devices')"
               />
               <UButton
                 :variant="activeTab === 'browsers' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-globe"
+                title="Browsers"
                 @click="setTab('browsers')"
+              />
+              <UButton
+                :variant="activeTab === 'os' ? 'solid' : 'outline'"
+                size="sm"
+                icon="i-lucide-monitor"
+                title="Operating Systems"
+                @click="setTab('os')"
               />
               <UButton
                 :variant="activeTab === 'referers' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-link-2"
+                title="Referers"
                 @click="setTab('referers')"
               />
               <UButton
-                :variant="activeTab === 'utm' ? 'solid' : 'outline'"
+                :variant="activeTab === 'utm_sources' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-tag"
-                @click="setTab('utm')"
+                title="UTM Sources"
+                @click="setTab('utm_sources')"
               />
             </UFieldGroup>
           </div>
