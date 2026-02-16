@@ -244,7 +244,7 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
                   {{
                     row.original.userId === currentUserId
                       ? "You"
-                      : row.original.user?.email || "Unknown"
+                      : row.original.user?.name || "Unknown"
                   }}
                 </span>
                 <UBadge

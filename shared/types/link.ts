@@ -1,4 +1,6 @@
 import { z } from "zod";
+import type { User } from "./database";
+import type { Organization } from "better-auth/plugins";
 
 export const LinkStatusSchema = z.enum(["active", "inactive", "expired"]);
 
@@ -48,19 +50,8 @@ export const LinkQuerySchema = z.object({
 });
 
 export const LinkWithDetailsSchema = LinkSchema.extend({
-  user: z
-    .object({
-      id: z.uuid(),
-      name: z.string().nullable(),
-      email: z.string(),
-    })
-    .nullable(),
-  organization: z
-    .object({
-      id: z.uuid(),
-      name: z.string(),
-    })
-    .nullable(),
+  user: z.custom<User>().nullable(),
+  organization: z.custom<Organization>().nullable(),
 });
 
 export type Link = z.infer<typeof LinkSchema>;
