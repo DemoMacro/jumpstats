@@ -1,4 +1,3 @@
-import type { Domain } from "~~/shared/types/domain";
 import { authClient } from "~/utils/auth";
 
 export interface DomainOption {

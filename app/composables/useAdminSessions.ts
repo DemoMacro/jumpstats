@@ -1,11 +1,4 @@
-import type { Session } from "better-auth";
 import { authClient } from "~/utils/auth";
-
-interface SessionWithUserInfo extends Session {
-  userEmail: string;
-  userName?: string;
-  role: string;
-}
 
 export const useAdminSessions = (searchValue?: Ref<string>) => {
   // Fetch sessions using useAsyncData for SSR optimization

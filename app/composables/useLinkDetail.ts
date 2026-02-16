@@ -1,4 +1,3 @@
-import type { Link } from "~~/shared/types/link";
 import { authClient } from "~/utils/auth";
 
 export function useLinkDetail(linkId: string) {

@@ -1,4 +1,3 @@
-import type { Member } from "better-auth/plugins";
 import { authClient } from "~/utils/auth";
 
 export const useOrgMembers = (orgId: string) => {
@@ -30,59 +29,47 @@ export const useOrgMembers = (orgId: string) => {
     role: "owner" | "admin" | "member",
     resend: boolean = true,
   ) => {
-    try {
-      const result = await authClient.organization.inviteMember({
-        email,
-        role,
-        organizationId: orgId,
-        resend,
-      });
+    const result = await authClient.organization.inviteMember({
+      email,
+      role,
+      organizationId: orgId,
+      resend,
+    });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to invite member");
-      }
-
-      // Refresh members list to get updated data
-      await fetchMembers();
-      return result;
-    } catch (err) {
-      throw err;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to invite member");
     }
+
+    // Refresh members list to get updated data
+    await fetchMembers();
+    return result;
   };
 
   const removeMember = async (memberId: string) => {
-    try {
-      const result = await authClient.organization.removeMember({
-        memberIdOrEmail: memberId,
-        organizationId: orgId,
-      });
+    const result = await authClient.organization.removeMember({
+      memberIdOrEmail: memberId,
+      organizationId: orgId,
+    });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to remove member");
-      }
-
-      // Refresh members list to get updated data
-      await fetchMembers();
-    } catch (err) {
-      throw err;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to remove member");
     }
+
+    // Refresh members list to get updated data
+    await fetchMembers();
   };
 
   const leaveOrganization = async () => {
-    try {
-      const result = await authClient.organization.leave({
-        organizationId: orgId,
-      });
+    const result = await authClient.organization.leave({
+      organizationId: orgId,
+    });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to leave organization");
-      }
-
-      // This would typically trigger a navigation or state change
-      // as the user is no longer a member of this organization
-    } catch (err) {
-      throw err;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to leave organization");
     }
+
+    // This would typically trigger a navigation or state change
+    // as the user is no longer a member of this organization
   };
 
   return {
