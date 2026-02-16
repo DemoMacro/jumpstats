@@ -1,6 +1,6 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
-import { LinkQuerySchema, type Link } from "../../../../types/link";
+import { LinkQuerySchema, type LinkWithDetails } from "../../../../types/link";
 import { buildLinkWhereConditions } from "../permissions";
 
 export const listLinks = () => {
@@ -53,8 +53,14 @@ export const listLinks = () => {
         adapter: ctx.context.adapter,
       });
 
-      // Fetch links with pagination
-      const links = await ctx.context.adapter.findMany<Link>({
+      // Build join options - only join when needed
+      // Personal mode: no joins needed
+      // Organization mode: join user and organization data
+      // Global admin: always join to show full context
+      const shouldJoin = session.user.role === "admin" || organizationId;
+
+      // Fetch links with pagination and optional joins
+      const links = await ctx.context.adapter.findMany<LinkWithDetails>({
         model: "link",
         where: whereConditions,
         limit,
@@ -63,6 +69,14 @@ export const listLinks = () => {
           field: "createdAt",
           direction: "desc",
         },
+        ...(shouldJoin
+          ? {
+              join: {
+                user: true,
+                organization: true,
+              },
+            }
+          : {}),
       });
 
       // Get total count

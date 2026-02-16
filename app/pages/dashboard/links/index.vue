@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import type { Link } from "~~/shared/types/link";
+import type { LinkWithDetails } from "~~/shared/types/link";
 import { getPaginationRowModel } from "@tanstack/table-core";
 import { authClient } from "~/utils/auth";
 import { useDomains } from "~/composables/useDomains";
@@ -29,8 +29,12 @@ const { domains } = useDomains();
 const activeOrgResult = authClient.useActiveOrganization();
 const activeOrg = computed(() => activeOrgResult.value.data);
 
+// Get current session
+const { data: session } = await authClient.useSession(useFetch);
+const currentUserId = computed(() => session.value?.user?.id);
+
 // Helper function to get the actual domain for a link
-function getLinkDomain(link: Link) {
+function getLinkDomain(link: LinkWithDetails) {
   if (!link.domainId) {
     return window.location.origin;
   }
@@ -49,7 +53,7 @@ watch(copied, (isCopied) => {
   }
 });
 
-async function copyToClipboard(link: Link) {
+async function copyToClipboard(link: LinkWithDetails) {
   if (!isSupported.value) {
     toast.add({
       title: "Error",
@@ -107,32 +111,40 @@ watch(error, (newError) => {
   }
 });
 
-const columns: TableColumn<Link>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    accessorKey: "shortCode",
-    header: "Short Code",
-  },
-  {
-    accessorKey: "domainId",
-    header: "Domain",
-  },
-  {
-    accessorKey: "originalUrl",
-    header: "Destination URL",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-  },
-];
+const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
+  const baseColumns: TableColumn<LinkWithDetails>[] = [
+    {
+      accessorKey: "title",
+      header: "Title",
+    },
+    {
+      accessorKey: "shortLink",
+      header: "Short Link",
+    },
+    {
+      accessorKey: "originalUrl",
+      header: "Destination URL",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+    },
+  ];
+
+  // Only add Created By column in organization mode
+  if (activeOrg.value) {
+    baseColumns.splice(2, 0, {
+      accessorKey: "createdBy",
+      header: "Created By",
+    });
+  }
+
+  return baseColumns;
+});
 </script>
 
 <template>
@@ -198,20 +210,47 @@ const columns: TableColumn<Link>[] = [
               td: 'border-b border-default',
             }"
           >
-            <template #shortCode-cell="{ row }">
-              <span class="font-mono text-sm">{{ row.getValue("shortCode") }}</span>
-            </template>
-
             <template #title-cell="{ row }">
               <span class="text-sm font-medium">
-                {{ row.getValue("title") || row.getValue("shortCode") }}
+                {{ row.getValue("title") || row.original.shortCode }}
               </span>
             </template>
 
-            <template #domainId-cell="{ row }">
-              <span class="text-sm">
-                {{ getLinkDomain(row.original as Link) }}
-              </span>
+            <template #shortLink-cell="{ row }">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm">
+                  {{ getLinkDomain(row.original) }}/s/{{ row.original.shortCode }}
+                </span>
+                <UButton
+                  variant="ghost"
+                  size="xs"
+                  icon="i-lucide-copy"
+                  title="Copy Link"
+                  @click="copyToClipboard(row.original)"
+                />
+              </div>
+            </template>
+
+            <template #createdBy-cell="{ row }">
+              <div class="flex items-center gap-2">
+                <div class="size-6 bg-primary/10 rounded-full flex items-center justify-center">
+                  <UIcon name="i-lucide-user" class="size-3" />
+                </div>
+                <span class="text-sm">
+                  {{
+                    row.original.userId === currentUserId
+                      ? "You"
+                      : row.original.user?.email || "Unknown"
+                  }}
+                </span>
+                <UBadge
+                  v-if="session?.user?.role === 'admin' && row.original.organization"
+                  size="xs"
+                  variant="subtle"
+                >
+                  {{ row.original.organization.name }}
+                </UBadge>
+              </div>
             </template>
 
             <template #originalUrl-cell="{ row }">
@@ -232,17 +271,10 @@ const columns: TableColumn<Link>[] = [
             <template #actions-cell="{ row }">
               <div class="flex items-center gap-2">
                 <UButton
-                  :to="`/dashboard/links/${(row.original as Link).id}`"
+                  :to="`/dashboard/links/${row.original.id}`"
                   variant="ghost"
                   icon="i-lucide-eye"
                   title="View Details"
-                />
-
-                <UButton
-                  variant="ghost"
-                  icon="i-lucide-copy"
-                  title="Copy Link"
-                  @click="copyToClipboard(row.original as Link)"
                 />
 
                 <UPopover>
@@ -251,8 +283,8 @@ const columns: TableColumn<Link>[] = [
                   <template #content>
                     <div class="p-4">
                       <img
-                        :src="`/qr/${(row.original as Link).shortCode}`"
-                        :alt="`QR Code for ${(row.original as Link).shortCode}`"
+                        :src="`/qr/${row.original.shortCode}`"
+                        :alt="`QR Code for ${row.original.shortCode}`"
                         class="w-32 h-32"
                       />
                     </div>

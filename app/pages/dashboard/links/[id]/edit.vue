@@ -34,11 +34,12 @@ watch(
     if (newLink) {
       state.originalUrl = newLink.originalUrl;
       state.domainId = newLink.domainId || "default";
-      state.title = newLink.title;
-      state.description = newLink.description;
-      state.status = newLink.status;
+      state.title = newLink.title ?? undefined;
+      state.description = newLink.description ?? undefined;
+      state.status = newLink.status ?? undefined;
     }
   },
+  { immediate: true },
 );
 
 const submitting = ref(false);

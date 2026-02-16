@@ -47,7 +47,24 @@ export const LinkQuerySchema = z.object({
   status: LinkStatusSchema.optional(),
 });
 
+export const LinkWithDetailsSchema = LinkSchema.extend({
+  user: z
+    .object({
+      id: z.uuid(),
+      name: z.string().nullable(),
+      email: z.string(),
+    })
+    .nullable(),
+  organization: z
+    .object({
+      id: z.uuid(),
+      name: z.string(),
+    })
+    .nullable(),
+});
+
 export type Link = z.infer<typeof LinkSchema>;
+export type LinkWithDetails = z.infer<typeof LinkWithDetailsSchema>;
 export type CreateLink = z.infer<typeof CreateLinkSchema>;
 export type UpdateLink = z.infer<typeof UpdateLinkSchema>;
 export type LinkStatus = z.infer<typeof LinkStatusSchema>;
