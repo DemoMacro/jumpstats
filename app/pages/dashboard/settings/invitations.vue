@@ -175,7 +175,7 @@ function formatDate(date: Date | string) {
                     : 'neutral'
               "
               variant="subtle"
-              size="xs"
+              size="sm"
             >
               {{ invitation.status }}
             </UBadge>

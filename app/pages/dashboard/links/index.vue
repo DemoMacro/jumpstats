@@ -249,7 +249,7 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
                 </span>
                 <UBadge
                   v-if="session?.user?.role === 'admin' && row.original.organization"
-                  size="xs"
+                  size="sm"
                   variant="subtle"
                 >
                   {{ row.original.organization.name }}

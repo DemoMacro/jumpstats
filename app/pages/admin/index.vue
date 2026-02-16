@@ -110,7 +110,6 @@ const items = [
               v-if="stat.variation && stat.variation !== 0"
               :color="stat.variation > 0 ? 'success' : 'error'"
               variant="subtle"
-              class="text-xs"
             >
               {{ stat.variation > 0 ? "+" : "" }}{{ stat.variation }}%
             </UBadge>
