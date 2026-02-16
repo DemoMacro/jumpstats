@@ -105,6 +105,11 @@ const items = computed<DropdownMenuItem[][]>(() => {
         icon: "i-lucide-mail",
         onSelect: () => navigateTo("/dashboard/settings/invitations"),
       },
+      {
+        label: "API Keys",
+        icon: "i-lucide-key",
+        onSelect: () => navigateTo("/dashboard/apikeys"),
+      },
     ],
     [
       {

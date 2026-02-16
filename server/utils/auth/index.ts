@@ -35,7 +35,15 @@ export const authConfig = {
     autoSignInAfterVerification: true,
     expiresIn: 3600, // 1 hour
   },
-  plugins: [username(), admin(), apiKey(), organization(), openAPI(), domain(), link()],
+  plugins: [
+    username(),
+    admin(),
+    apiKey({ enableSessionForAPIKeys: true }),
+    organization(),
+    openAPI(),
+    domain(),
+    link(),
+  ],
   user: {
     deleteUser: {
       enabled: true,
