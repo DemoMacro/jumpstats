@@ -25,6 +25,10 @@ const toast = useToast();
 const { copy, copied, isSupported } = useClipboard();
 const { domains } = useDomains();
 
+// Get active organization
+const activeOrgResult = authClient.useActiveOrganization();
+const activeOrg = computed(() => activeOrgResult.value.data);
+
 // Helper function to get the actual domain for a link
 function getLinkDomain(link: Link) {
   if (!link.domainId) {
@@ -69,8 +73,14 @@ const {
 } = await useAsyncData(
   "links",
   async () => {
+    // Build query based on active organization
+    const query: Record<string, any> = {};
+    if (activeOrg.value?.id) {
+      query.organizationId = activeOrg.value.id;
+    }
+
     const result = await authClient.link.list({
-      query: {},
+      query,
     });
     return result.data;
   },
@@ -79,6 +89,7 @@ const {
       links: data?.links ?? [],
       total: data?.total ?? 0,
     }),
+    watch: [activeOrg], // Re-fetch when active organization changes
   },
 );
 

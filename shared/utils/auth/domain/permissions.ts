@@ -15,23 +15,33 @@ export async function canAccessDomain(
   domain: Domain,
   session: Session,
 ): Promise<boolean> {
-  // Global admin
+  // Global admin has full access
   if (session.user.role === "admin") return true;
 
-  // Domain owner
-  if (domain.userId === session.user.id) return true;
+  // Personal domains (organizationId IS NULL) - only creator can operate
+  if (!domain.organizationId) {
+    return domain.userId === session.user.id;
+  }
 
-  // Organization admin/owner
-  if (domain.organizationId) {
-    const member = await ctx.context.adapter.findOne<Member>({
-      model: "member",
-      where: [
-        { field: "organizationId", value: domain.organizationId },
-        { field: "userId", value: session.user.id },
-      ],
-    });
+  // Organization domains - check member role
+  const member = await ctx.context.adapter.findOne<Member>({
+    model: "member",
+    where: [
+      { field: "organizationId", value: domain.organizationId },
+      { field: "userId", value: session.user.id },
+    ],
+  });
 
-    return member?.role === "admin" || member?.role === "owner";
+  if (!member) return false;
+
+  // Owner/Admin can operate all organization domains
+  if (member.role === "owner" || member.role === "admin") {
+    return true;
+  }
+
+  // Regular members can only operate domains they created
+  if (member.role === "member") {
+    return domain.userId === session.user.id;
   }
 
   return false;
@@ -43,18 +53,18 @@ export async function buildDomainWhereConditions(params: {
   organizationId?: string;
   status?: string;
   adapter: DBAdapter;
-}): Promise<Array<{ field: string; value: string | number }>> {
+}): Promise<Array<{ field: string; value: string | number | null }>> {
   const { userId, userRole, organizationId, status, adapter } = params;
 
-  // Global admin - can see all domains
+  // Global admin can see all domains
   if (userRole === "admin") {
-    const conditions: Array<{ field: string; value: string | number }> = [];
+    const conditions: Array<{ field: string; value: string | number | null }> = [];
     if (organizationId) conditions.push({ field: "organizationId", value: organizationId });
     if (status) conditions.push({ field: "status", value: status });
     return conditions;
   }
 
-  // Regular user
+  // Organization mode
   if (organizationId) {
     const member = await adapter.findOne<Member>({
       model: "member",
@@ -78,7 +88,7 @@ export async function buildDomainWhereConditions(params: {
       ];
     }
 
-    // Regular member can only see their own domains in org
+    // Regular member can only see their own domains in the org
     return [
       { field: "organizationId", value: organizationId },
       { field: "userId", value: userId },
@@ -86,9 +96,10 @@ export async function buildDomainWhereConditions(params: {
     ];
   }
 
-  // Only user's own domains
+  // Personal mode - only show personal domains (userId matches AND orgId is null)
   return [
     { field: "userId", value: userId },
+    { field: "organizationId", value: null },
     ...(status ? [{ field: "status", value: status }] : []),
   ];
 }

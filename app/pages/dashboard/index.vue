@@ -25,6 +25,10 @@ const toast = useToast();
 const { copy, copied, isSupported } = useClipboard();
 const { domains } = useDomains();
 
+// Get active organization
+const activeOrgResult = authClient.useActiveOrganization();
+const activeOrg = computed(() => activeOrgResult.value.data);
+
 // Watch copied state and show toast notification
 watch(copied, (isCopied) => {
   if (isCopied) {
@@ -69,8 +73,14 @@ const {
 } = await useAsyncData(
   "recent-links",
   async () => {
+    // Build query based on active organization
+    const query: Record<string, any> = { limit: 5 };
+    if (activeOrg.value?.id) {
+      query.organizationId = activeOrg.value.id;
+    }
+
     const result = await authClient.link.list({
-      query: { limit: 5 },
+      query,
     });
     return result.data;
   },
@@ -79,6 +89,7 @@ const {
       links: data?.links ?? [],
       total: data?.total ?? 0,
     }),
+    watch: [activeOrg], // Re-fetch when active organization changes
   },
 );
 

@@ -21,6 +21,10 @@ const pagination = ref({
 
 const toast = useToast();
 
+// Get active organization
+const activeOrgResult = authClient.useActiveOrganization();
+const activeOrg = computed(() => activeOrgResult.value.data);
+
 async function copyToClipboard(token: string) {
   try {
     await navigator.clipboard.writeText(token);
@@ -47,8 +51,14 @@ const {
 } = await useAsyncData(
   "domains",
   async () => {
+    // Build query based on active organization
+    const query: Record<string, any> = {};
+    if (activeOrg.value?.id) {
+      query.organizationId = activeOrg.value.id;
+    }
+
     const result = await authClient.domain.list({
-      query: {},
+      query,
     });
     return result.data;
   },
@@ -57,6 +67,7 @@ const {
       domains: data?.domains ?? [],
       total: data?.total ?? 0,
     }),
+    watch: [activeOrg], // Re-fetch when active organization changes
   },
 );
 

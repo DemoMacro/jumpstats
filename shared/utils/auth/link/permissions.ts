@@ -15,23 +15,33 @@ export async function canAccessLink(
   link: Link,
   session: Session,
 ): Promise<boolean> {
-  // Global admin
+  // Global admin has full access
   if (session.user.role === "admin") return true;
 
-  // Link owner
-  if (link.userId === session.user.id) return true;
+  // Personal links (organizationId IS NULL) - only creator can operate
+  if (!link.organizationId) {
+    return link.userId === session.user.id;
+  }
 
-  // Organization admin/owner
-  if (link.organizationId) {
-    const member = await ctx.context.adapter.findOne<Member>({
-      model: "member",
-      where: [
-        { field: "organizationId", value: link.organizationId },
-        { field: "userId", value: session.user.id },
-      ],
-    });
+  // Organization links - check member role
+  const member = await ctx.context.adapter.findOne<Member>({
+    model: "member",
+    where: [
+      { field: "organizationId", value: link.organizationId },
+      { field: "userId", value: session.user.id },
+    ],
+  });
 
-    return member?.role === "admin" || member?.role === "owner";
+  if (!member) return false;
+
+  // Owner/Admin can operate all organization links
+  if (member.role === "owner" || member.role === "admin") {
+    return true;
+  }
+
+  // Regular members can only operate links they created
+  if (member.role === "member") {
+    return link.userId === session.user.id;
   }
 
   return false;
@@ -43,18 +53,18 @@ export async function buildLinkWhereConditions(params: {
   organizationId?: string;
   status?: string;
   adapter: DBAdapter;
-}): Promise<Array<{ field: string; value: string | number }>> {
+}): Promise<Array<{ field: string; value: string | number | null }>> {
   const { userId, userRole, organizationId, status, adapter } = params;
 
-  // Global admin - can see all links
+  // Global admin can see all links
   if (userRole === "admin") {
-    const conditions: Array<{ field: string; value: string | number }> = [];
+    const conditions: Array<{ field: string; value: string | number | null }> = [];
     if (organizationId) conditions.push({ field: "organizationId", value: organizationId });
     if (status) conditions.push({ field: "status", value: status });
     return conditions;
   }
 
-  // Regular user
+  // Organization mode
   if (organizationId) {
     const member = await adapter.findOne<Member>({
       model: "member",
@@ -86,9 +96,10 @@ export async function buildLinkWhereConditions(params: {
     ];
   }
 
-  // Only user's own links
+  // Personal mode - only show personal links (userId matches AND orgId is null)
   return [
     { field: "userId", value: userId },
+    { field: "organizationId", value: null },
     ...(status ? [{ field: "status", value: status }] : []),
   ];
 }

@@ -10,6 +10,10 @@ definePageMeta({
 
 const toast = useToast();
 
+// Get active organization
+const activeOrgResult = authClient.useActiveOrganization();
+const activeOrg = computed(() => activeOrgResult.value.data);
+
 const schema = z.object({
   domainName: z.string().min(1, "Please enter a domain name"),
   organizationId: z.string().optional(),
@@ -29,7 +33,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
   try {
     const result = await authClient.domain.create({
       domainName: event.data.domainName,
-      organizationId: event.data.organizationId || null,
+      organizationId: activeOrg.value?.id || null,
     });
 
     if (result.error) {
@@ -119,15 +123,12 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
             <UFormField
               name="organizationId"
               label="Organization"
-              description="Optional: Assign this domain to an organization."
+              :description="
+                activeOrg ? `Creating for: ${activeOrg.name}` : 'Creating as personal domain'
+              "
               class="flex max-sm:flex-col justify-between items-start gap-4"
             >
-              <UInput
-                v-model="state.organizationId"
-                placeholder="Leave empty for personal domain"
-                :disabled="submitting"
-                class="w-full"
-              />
+              <UInput :model-value="activeOrg?.name || 'Personal'" disabled class="w-full" />
             </UFormField>
 
             <USeparator />

@@ -10,6 +10,10 @@ definePageMeta({
 
 const toast = useToast();
 
+// Get active organization
+const activeOrgResult = authClient.useActiveOrganization();
+const activeOrg = computed(() => activeOrgResult.value.data);
+
 const schema = z.object({
   originalUrl: z.string().url("Please enter a valid URL"),
   domainId: z.string().optional(),
@@ -42,6 +46,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
       description: event.data.description || null,
       status: event.data.status || "active",
       expiresAt: event.data.expiresAt ? new Date(event.data.expiresAt) : null,
+      organizationId: activeOrg.value?.id,
     });
 
     if (result.error) {
