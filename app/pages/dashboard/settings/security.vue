@@ -313,41 +313,49 @@ onMounted(() => {
 
     <!-- Sessions Section -->
     <UPageCard
-      title="Active Sessions"
-      description="Manage your active sessions across devices."
       variant="subtle"
+      :ui="{
+        container: 'p-0 sm:p-0 gap-y-0',
+        wrapper: 'items-stretch',
+        header: 'p-4 mb-0 border-b border-default',
+      }"
     >
-      <div class="flex justify-between items-center mb-4">
-        <div class="text-sm text-muted">
-          {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
-          active sessions
+      <template #header>
+        <div class="flex items-center justify-between gap-3">
+          <div class="text-sm text-muted">
+            {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
+            active sessions
+          </div>
+          <UButton
+            variant="outline"
+            size="sm"
+            @click="revokeAllOtherSessions"
+            :disabled="sessions.length <= 1"
+          >
+            <UIcon name="i-lucide-power" class="size-4 mr-2" />
+            Revoke all other sessions
+          </UButton>
         </div>
-        <UButton
-          variant="outline"
-          size="sm"
-          @click="revokeAllOtherSessions"
-          :disabled="sessions.length <= 1"
-        >
-          <UIcon name="i-lucide-power" class="size-4 mr-2" />
-          Revoke all other sessions
-        </UButton>
-      </div>
+      </template>
 
+      <!-- Loading State -->
       <div v-if="sessionsLoading" class="flex items-center justify-center py-8">
         <UIcon name="i-lucide-loader-2" class="animate-spin size-6" />
       </div>
 
+      <!-- Empty State -->
       <div v-else-if="sessions.length === 0" class="text-center py-8">
         <UIcon name="i-lucide-key-round" class="size-12 text-muted mx-auto mb-4" />
         <h3 class="text-lg font-semibold mb-2">No sessions found</h3>
         <p class="text-sm text-muted">You don't have any active sessions.</p>
       </div>
 
+      <!-- Sessions List -->
       <ul v-else role="list" class="divide-y divide-default">
         <li
           v-for="sessionItem in sessions"
           :key="sessionItem.token"
-          class="flex items-center justify-between gap-3 py-3 px-4 sm:px-6"
+          class="flex items-center justify-between gap-3 py-4 px-4 sm:px-6"
         >
           <div class="flex items-center gap-3 min-w-0">
             <div class="size-10 bg-primary/10 rounded-full flex items-center justify-center">

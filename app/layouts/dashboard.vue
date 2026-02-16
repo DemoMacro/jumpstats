@@ -136,7 +136,10 @@ const groups = computed(() => [
 ]);
 
 onMounted(async () => {
-  const cookie = useCookie("cookie-consent");
+  const cookie = useCookie("cookie-consent", {
+    maxAge: 365 * 24 * 60 * 60, // 1 year
+    sameSite: "lax",
+  });
   if (cookie.value === "accepted") {
     return;
   }

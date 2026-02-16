@@ -148,7 +148,7 @@ function formatDate(date: Date | string) {
         <li
           v-for="(invitation, index) in invitations"
           :key="index"
-          class="flex items-center justify-between gap-3 py-3 px-4 sm:px-6"
+          class="flex items-center justify-between gap-3 py-4 px-4 sm:px-6"
         >
           <div class="flex items-center gap-3 min-w-0">
             <div class="size-10 bg-primary/10 rounded-full flex items-center justify-center">
