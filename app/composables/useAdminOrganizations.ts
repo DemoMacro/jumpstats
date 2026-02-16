@@ -11,68 +11,63 @@ interface OrganizationCreateData {
   keepCurrentActiveOrganization?: boolean;
 }
 
-export const useAdminOrganizations = () => {
-  const organizations = useState<Organization[]>("admin-organizations", () => []);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-  const total = ref(0);
+export const useAdminOrganizations = (options?: {
+  limit?: number;
+  offset?: number;
+  searchValue?: string;
+}) => {
+  // Fetch organizations using useAsyncData for SSR optimization
+  const {
+    data: orgsData,
+    pending: loading,
+    refresh: fetchOrganizations,
+  } = useAsyncData(
+    "admin-organizations",
+    async () => {
+      const result = await authClient.organization.list({
+        query: {
+          limit: options?.limit || 100,
+          offset: options?.offset || 0,
+          searchValue: options?.searchValue,
+          sortBy: "name",
+        },
+      });
+      return result.data;
+    },
+    {
+      transform: (data) => ({
+        organizations: data ?? [],
+        total: data?.length ?? 0,
+      }),
+    },
+  );
 
-  const fetchOrganizations = async () => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      // Better-Auth doesn't have a direct admin list organizations endpoint
-      // We'll use the regular list method which returns orgs for the current user
-      // For admin purposes, you might need to implement a custom server endpoint
-      const result = await authClient.organization.list();
-
-      if (result.data) {
-        organizations.value = result.data;
-        total.value = result.data.length;
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch organizations";
-      organizations.value = [];
-    } finally {
-      loading.value = false;
-    }
-  };
+  const organizations = computed(() => orgsData.value?.organizations ?? []);
+  const total = computed(() => orgsData.value?.total ?? 0);
 
   const createOrganization = async (data: OrganizationCreateData) => {
-    try {
-      const result = await authClient.organization.create(data);
+    const result = await authClient.organization.create(data);
 
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to create organization");
-      }
-
-      // Refresh organizations list
-      await fetchOrganizations();
-      return result;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to create organization";
-      throw err;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to create organization");
     }
+
+    // Refresh organizations list
+    await fetchOrganizations();
+    return result;
   };
 
   const deleteOrganization = async (organizationId: string) => {
-    try {
-      const result = await authClient.organization.delete({
-        organizationId,
-      });
+    const result = await authClient.organization.delete({
+      organizationId,
+    });
 
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to delete organization");
-      }
-
-      // Remove from local state immediately
-      organizations.value = organizations.value.filter((org) => org.id !== organizationId);
-      total.value = organizations.value.length;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to delete organization";
-      throw err;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to delete organization");
     }
+
+    // Refresh to get updated list
+    await fetchOrganizations();
   };
 
   const getOrganizationById = (organizationId: string): Organization | null => {
@@ -82,17 +77,14 @@ export const useAdminOrganizations = () => {
   // Computed property for search/filter functionality
   const filteredOrganizations = computed(() => {
     if (!organizations.value.length) return [];
-
-    // If you need server-side filtering, implement it in fetchOrganizations
     return organizations.value;
   });
 
   return {
-    organizations: readonly(organizations),
+    organizations,
     filteredOrganizations,
-    loading: readonly(loading),
-    error: readonly(error),
-    total: readonly(total),
+    loading,
+    total,
     fetchOrganizations,
     createOrganization,
     deleteOrganization,

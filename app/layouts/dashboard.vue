@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { authClient } from "~/utils/auth";
 
 const route = useRoute();
 const toast = useToast();
@@ -72,11 +73,30 @@ const dashboardLinks = [
   },
 ];
 
+// Get active organization to conditionally show Organization link
+const activeOrgResult = authClient.useActiveOrganization();
+const hasActiveOrg = computed(() => !!activeOrgResult.value.data);
+
+// Add Organization link if there's an active organization
+const organizationLink = {
+  label: "Organization",
+  icon: "i-lucide-building",
+  to: "/dashboard/org",
+  onSelect: () => {
+    open.value = false;
+  },
+};
+
 const links = computed(() => {
   const mainLinks = isAdmin.value ? adminLinks : dashboardLinks;
 
+  // Add Organization link to dashboard if there's an active organization
+  const finalMainLinks = isAdmin.value
+    ? mainLinks
+    : [...mainLinks, ...(hasActiveOrg.value ? [organizationLink] : [])];
+
   return [
-    mainLinks,
+    finalMainLinks,
     [
       {
         label: "Feedback",
@@ -154,6 +174,10 @@ onMounted(async () => {
       class="bg-elevated/25"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
+      <template #header="{ collapsed }">
+        <OrgsMenu :collapsed="collapsed" />
+      </template>
+
       <template #default="{ collapsed }">
         <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 

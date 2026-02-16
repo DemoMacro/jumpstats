@@ -7,8 +7,7 @@ const userId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for user data
-const { user, loading, error, fetchUser, updateUser, banUser, unbanUser, removeUser } =
-  useAdminUser(userId);
+const { user, loading, updateUser, banUser, unbanUser, removeUser } = useAdminUser(userId);
 
 // Password form schema
 const passwordSchema = z
@@ -238,9 +237,8 @@ function getSessionStatus(expiresAt: string) {
   return expiry > now;
 }
 
-// Auto-fetch data on mount
+// Auto-fetch sessions on mount when user data is loaded
 onMounted(() => {
-  fetchUser();
   if (user.value) {
     fetchUserSessions();
   }

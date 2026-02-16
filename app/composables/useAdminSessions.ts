@@ -7,27 +7,25 @@ interface SessionWithUserInfo extends Session {
   role: string;
 }
 
-export const useAdminSessions = () => {
-  const sessions = ref<SessionWithUserInfo[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-
-  const fetchSessions = async (searchValue?: string) => {
-    loading.value = true;
-    error.value = null;
-
-    try {
+export const useAdminSessions = (searchValue?: Ref<string>) => {
+  // Fetch sessions using useAsyncData for SSR optimization
+  const {
+    data: sessionsData,
+    pending: loading,
+    refresh: fetchSessions,
+  } = useAsyncData(
+    computed(() => `admin-sessions-${searchValue?.value || "all"}`),
+    async () => {
       // First get all users
       const usersResult = await authClient.admin.listUsers({
         query: {
           limit: 1000,
-          searchValue,
+          searchValue: searchValue?.value,
         },
       });
 
       if (!usersResult.data?.users) {
-        sessions.value = [];
-        return;
+        return [];
       }
 
       const allSessions = [];
@@ -55,14 +53,11 @@ export const useAdminSessions = () => {
         }
       }
 
-      sessions.value = allSessions;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch sessions";
-      sessions.value = [];
-    } finally {
-      loading.value = false;
-    }
-  };
+      return allSessions;
+    },
+  );
+
+  const sessions = computed(() => sessionsData.value ?? []);
 
   const revokeUserSessions = async (userId: string) => {
     const result = await authClient.admin.revokeUserSessions({
@@ -73,24 +68,15 @@ export const useAdminSessions = () => {
       throw new Error(result.error.message || "Failed to revoke sessions");
     }
 
-    // Remove user's sessions from local state
-    sessions.value = sessions.value.filter((s) => s.userId !== userId);
+    // Refresh to get updated sessions
+    await fetchSessions();
 
     return true;
   };
 
-  // Create mutable copy for table
-  const mutableSessions = ref<SessionWithUserInfo[]>([]);
-
-  // Update mutable sessions when readonly sessions change
-  watch(sessions, (newSessions) => {
-    mutableSessions.value = [...newSessions];
-  });
-
   return {
-    sessions: mutableSessions,
-    loading: readonly(loading),
-    error: readonly(error),
+    sessions,
+    loading,
     fetchSessions,
     revokeUserSessions,
   };

@@ -7,9 +7,6 @@ definePageMeta({
   title: "Sessions - Admin - JumpStats",
 });
 
-// Use composable for session data
-const { sessions, loading, error, fetchSessions, revokeUserSessions } = useAdminSessions();
-
 // Table state
 const table = useTemplateRef("table");
 const columnFilters = ref([
@@ -28,20 +25,20 @@ const pagination = ref({
 
 const toast = useToast();
 
+const searchValue = ref("");
+
+// Use composable for session data with reactive search
+const { sessions, loading, fetchSessions, revokeUserSessions } = useAdminSessions(searchValue);
+
 const total = computed(() => sessions.value.length);
 
-// Watch for search changes
+// Watch for search changes - sync search input with searchValue
 watch(
   () => columnFilters.value[0]?.value,
-  () => {
-    fetchSessions(columnFilters.value[0]?.value);
+  (newValue) => {
+    searchValue.value = newValue || "";
   },
 );
-
-// Load data on mount
-onMounted(() => {
-  fetchSessions();
-});
 
 // Table columns
 const columns: TableColumn<any>[] = [

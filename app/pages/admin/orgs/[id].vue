@@ -10,7 +10,7 @@ const route = useRoute();
 const orgId = route.params.id as string;
 
 // Use composable for organization data
-const { organization, loading, error, fetchOrg } = useAdminOrg(orgId);
+const { organization, loading } = useAdminOrg(orgId);
 
 // Navigation items
 const links = [
@@ -33,11 +33,6 @@ const links = [
     },
   ],
 ] satisfies NavigationMenuItem[][];
-
-// Auto-fetch data on mount
-onMounted(() => {
-  fetchOrg();
-});
 </script>
 
 <template>
@@ -58,12 +53,6 @@ onMounted(() => {
     <template #body>
       <div v-if="loading" class="flex items-center justify-center h-64">
         <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
-      </div>
-
-      <div v-else-if="error" class="text-center py-8">
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">Error</h3>
-        <p class="text-muted-foreground mb-4">{{ error }}</p>
-        <UButton @click="fetchOrg">Retry</UButton>
       </div>
 
       <div v-else-if="!organization" class="text-center py-8">

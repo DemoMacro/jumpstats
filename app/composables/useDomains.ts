@@ -7,34 +7,28 @@ export interface DomainOption {
 }
 
 export function useDomains() {
-  const domains = ref<Domain[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
+  // Fetch domains using useAsyncData for SSR optimization
+  const {
+    data: domainsData,
+    pending: loading,
+    refresh: fetchDomains,
+  } = useAsyncData("domains", async () => {
+    const result = await authClient.domain.list({
+      query: {
+        status: "active",
+        limit: 100,
+        offset: 0,
+      },
+    });
 
-  async function fetchDomains() {
-    loading.value = true;
-    error.value = null;
-    try {
-      const result = await authClient.domain.list({
-        query: {
-          status: "active",
-          limit: 100,
-          offset: 0,
-        },
-      });
-
-      if (result.error) {
-        error.value = result.error.message || "Failed to fetch domains";
-        return;
-      }
-
-      domains.value = result.data.domains || [];
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : "An unexpected error occurred";
-    } finally {
-      loading.value = false;
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to fetch domains");
     }
-  }
+
+    return result.data.domains || [];
+  });
+
+  const domains = computed(() => domainsData.value ?? []);
 
   // Convert domains to select options format
   const domainOptions = computed<DomainOption[]>(() => {
@@ -57,15 +51,9 @@ export function useDomains() {
     return options;
   });
 
-  // Auto-fetch on mount
-  onMounted(() => {
-    void fetchDomains();
-  });
-
   return {
     domains,
     loading,
-    error,
     domainOptions,
     refresh: fetchDomains,
   };

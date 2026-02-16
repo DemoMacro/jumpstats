@@ -6,7 +6,7 @@ import { authClient } from "~/utils/auth";
 const route = useRoute();
 const linkId = route.params.id as string;
 
-const { link, loading, error, fetchLink } = useLinkDetail(linkId);
+const { link, loading, fetchLink } = useLinkDetail(linkId);
 
 const toast = useToast();
 

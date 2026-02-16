@@ -7,7 +7,7 @@ const orgId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for organization data
-const { organization, loading, error, fetchOrg, updateOrg } = useAdminOrg(orgId);
+const { organization, loading, updateOrg } = useAdminOrg(orgId);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
@@ -49,11 +49,6 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
     });
   }
 };
-
-// Auto-fetch data on mount
-onMounted(() => {
-  fetchOrg();
-});
 </script>
 
 <template>

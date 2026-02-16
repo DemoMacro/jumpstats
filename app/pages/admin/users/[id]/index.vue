@@ -7,7 +7,7 @@ const userId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for user data
-const { user, loading, error, fetchUser, updateUser } = useAdminUser(userId);
+const { user, loading, updateUser } = useAdminUser(userId);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
@@ -54,11 +54,6 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
     });
   }
 };
-
-// Auto-fetch data on mount
-onMounted(() => {
-  fetchUser();
-});
 </script>
 
 <template>

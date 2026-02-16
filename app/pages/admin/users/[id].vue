@@ -10,7 +10,7 @@ const route = useRoute();
 const userId = route.params.id as string;
 
 // Use composable for user data
-const { user, loading, error, fetchUser } = useAdminUser(userId);
+const { user, loading } = useAdminUser(userId);
 
 // Navigation items
 const links = [
@@ -28,11 +28,6 @@ const links = [
     },
   ],
 ] satisfies NavigationMenuItem[][];
-
-// Auto-fetch data on mount
-onMounted(() => {
-  fetchUser();
-});
 </script>
 
 <template>
@@ -53,12 +48,6 @@ onMounted(() => {
     <template #body>
       <div v-if="loading" class="flex items-center justify-center h-64">
         <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
-      </div>
-
-      <div v-else-if="error" class="text-center py-8">
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">Error</h3>
-        <p class="text-muted-foreground mb-4">{{ error }}</p>
-        <UButton @click="fetchUser">Retry</UButton>
       </div>
 
       <div v-else-if="!user" class="text-center py-8">

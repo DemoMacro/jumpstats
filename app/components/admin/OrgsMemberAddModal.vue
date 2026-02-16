@@ -5,7 +5,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
-  organization: Organization | null;
+  organization: Organization | null | undefined;
 }>();
 
 const toast = useToast();

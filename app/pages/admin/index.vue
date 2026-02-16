@@ -35,12 +35,6 @@ const items = [
           </UDropdownMenu>
         </template>
       </UDashboardNavbar>
-
-      <UDashboardToolbar>
-        <template #left>
-          <div class="text-sm text-muted-foreground">Overview</div>
-        </template>
-      </UDashboardToolbar>
     </template>
 
     <template #body>

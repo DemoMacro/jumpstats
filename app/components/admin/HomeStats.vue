@@ -7,8 +7,7 @@ interface Stat {
 }
 
 // Use admin stats composable
-const { totalUsers, totalOrgs, adminUsers, activeSessions, loading, error, fetchStats } =
-  useAdminStats();
+const { totalUsers, totalOrgs, adminUsers, activeSessions, loading, fetchStats } = useAdminStats();
 
 // Define stats data
 const stats = computed<Stat[]>(() => [
@@ -64,10 +63,6 @@ onMounted(() => {
       <div v-if="loading" class="flex items-center gap-2">
         <UIcon name="i-lucide-loader-2" class="animate-spin size-4 text-muted-foreground" />
         <span class="text-muted-foreground text-sm">Loading...</span>
-      </div>
-      <div v-else-if="error" class="flex items-center gap-2">
-        <UIcon name="i-lucide-alert-circle" class="size-4 text-error" />
-        <span class="text-error text-sm">Error</span>
       </div>
       <div v-else class="flex items-center gap-2">
         <span class="text-2xl font-semibold text-highlighted">

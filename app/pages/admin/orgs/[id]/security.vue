@@ -7,10 +7,7 @@ const route = useRoute();
 const orgId = route.params.id as string;
 
 // Use composable for organization data
-const { organization, loading, error, fetchOrg } = useAdminOrg(orgId);
-
-// Auto-fetch data on mount
-await fetchOrg();
+const { organization, loading } = useAdminOrg(orgId);
 </script>
 
 <template>
@@ -31,7 +28,7 @@ await fetchOrg();
     <UPageCard
       title="Account"
       description="No longer want to use our service? You can delete this organization here. This action is not reversible. All information related to this organization will be deleted permanently."
-      class="bg-gradient-to-tl from-error/10 from-5% to-default"
+      class="bg-linear-to-tl from-error/10 from-5% to-default"
     >
       <template #footer>
         <AdminOrgsDeleteModal :organization="organization">

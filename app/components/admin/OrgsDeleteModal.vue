@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { Organization } from "better-auth/plugins";
 import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
-import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
   organization: Organization | null;

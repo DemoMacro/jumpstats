@@ -7,38 +7,28 @@ interface UserUpdateData extends Partial<UserWithRole> {
 }
 
 export const useAdminUser = (userId: string) => {
-  const user = useState<UserWithRole | null>(`admin-user-${userId}`, () => null);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
+  // Fetch user using useAsyncData for SSR optimization
+  const {
+    data: userData,
+    pending: loading,
+    refresh: fetchUser,
+  } = useAsyncData(`admin-user-${userId}`, async () => {
+    const result = await authClient.admin.listUsers({
+      query: {
+        limit: 1000,
+        filterField: "id",
+        filterValue: userId,
+        filterOperator: "eq",
+      },
+    });
 
-  const fetchUser = async () => {
-    if (user.value && !error.value) return; // 有缓存数据且无错误时直接返回
-
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const result = await authClient.admin.listUsers({
-        query: {
-          limit: 1000,
-          filterField: "id",
-          filterValue: userId,
-          filterOperator: "eq",
-        },
-      });
-
-      if (result.data?.users && result.data.users.length > 0) {
-        user.value = result.data.users[0] || null;
-      } else {
-        throw new Error("User not found");
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch user";
-      user.value = null;
-    } finally {
-      loading.value = false;
+    if (result.data?.users && result.data.users.length > 0) {
+      return result.data.users[0] || null;
     }
-  };
+    return null;
+  });
+
+  const user = computed(() => userData.value);
 
   const updateUser = async (updates: UserUpdateData) => {
     if (!user.value) return;
@@ -53,8 +43,6 @@ export const useAdminUser = (userId: string) => {
       if (result.error) {
         throw new Error(result.error.message || "Failed to update role");
       }
-      // 立即更新本地状态
-      user.value.role = updates.role;
     }
 
     // 更新密码
@@ -99,11 +87,10 @@ export const useAdminUser = (userId: string) => {
       if (result.error) {
         throw new Error(result.error.message || "Failed to update user");
       }
-      // 立即更新本地状态
-      if (user.value) {
-        Object.assign(user.value, updateData);
-      }
     }
+
+    // Refresh user data
+    await fetchUser();
   };
 
   // 禁用用户
@@ -120,12 +107,8 @@ export const useAdminUser = (userId: string) => {
       throw new Error(result.error.message || "Failed to ban user");
     }
 
-    // 更新本地状态
-    user.value.banned = true;
-    user.value.banReason = banReason || "Banned by admin";
-    if (banExpiresIn) {
-      user.value.banExpires = new Date(Date.now() + banExpiresIn * 1000);
-    }
+    // Refresh user data
+    await fetchUser();
   };
 
   // 解禁用户
@@ -140,10 +123,8 @@ export const useAdminUser = (userId: string) => {
       throw new Error(result.error.message || "Failed to unban user");
     }
 
-    // 更新本地状态
-    user.value.banned = false;
-    user.value.banReason = null;
-    user.value.banExpires = null;
+    // Refresh user data
+    await fetchUser();
   };
 
   // 删除用户
@@ -158,8 +139,8 @@ export const useAdminUser = (userId: string) => {
       throw new Error(result.error.message || "Failed to remove user");
     }
 
-    // 清除本地状态
-    user.value = null;
+    // Clear local state
+    userData.value = null;
   };
 
   // 冒充用户
@@ -178,10 +159,9 @@ export const useAdminUser = (userId: string) => {
   };
 
   return {
-    user: readonly(user),
-    loading: readonly(loading),
-    error: readonly(error),
-    fetchUser,
+    user,
+    loading,
+    fetchUser: () => fetchUser(),
     updateUser,
     banUser,
     unbanUser,

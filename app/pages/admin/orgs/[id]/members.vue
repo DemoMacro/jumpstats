@@ -9,23 +9,11 @@ const route = useRoute();
 const orgId = route.params.id as string;
 
 // Use composables for data
-const { organization, loading: orgLoading, error: orgError, fetchOrg } = useAdminOrg(orgId);
-const {
-  members,
-  loading: membersLoading,
-  error: membersError,
-  fetchMembers,
-  inviteMember,
-} = useOrgMembers(orgId);
+const { organization, loading: orgLoading } = useAdminOrg(orgId);
+const { members, loading: membersLoading, fetchMembers, inviteMember } = useOrgMembers(orgId);
 
 // Search state
 const searchValue = ref("");
-
-// Load data on mount
-onMounted(async () => {
-  await fetchOrg();
-  fetchMembers();
-});
 </script>
 
 <template>

@@ -12,7 +12,7 @@ const linkId = route.params.id as string;
 
 const toast = useToast();
 
-const { link, loading, error, fetchLink } = useLinkDetail(linkId);
+const { link, loading, fetchLink } = useLinkDetail(linkId);
 const { domains } = useDomains();
 
 const { copy, copied, isSupported } = useClipboard();
@@ -80,10 +80,6 @@ const links = computed<NavigationMenuItem[][]>(() => [
     },
   ],
 ]);
-
-onMounted(() => {
-  fetchLink();
-});
 </script>
 
 <template>
@@ -140,12 +136,6 @@ onMounted(() => {
     <template #body>
       <div v-if="loading" class="flex items-center justify-center h-64">
         <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
-      </div>
-
-      <div v-else-if="error" class="text-center py-8">
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">Error</h3>
-        <p class="text-muted-foreground mb-4">{{ error }}</p>
-        <UButton @click="fetchLink">Retry</UButton>
       </div>
 
       <div v-else-if="!link" class="text-center py-8">

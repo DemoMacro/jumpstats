@@ -8,33 +8,17 @@ interface OrganizationUpdateData extends Partial<Organization> {
 }
 
 export const useAdminOrg = (orgId: string) => {
-  const organization = useState<Organization | null>(`admin-org-${orgId}`, () => null);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-
-  const fetchOrg = async () => {
-    if (organization.value && !error.value) return;
-
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const result = await authClient.organization.getFullOrganization({
-        query: { organizationId: orgId },
-      });
-
-      if (result.data) {
-        organization.value = result.data;
-      } else {
-        throw new Error("Organization not found");
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch organization";
-      organization.value = null;
-    } finally {
-      loading.value = false;
-    }
-  };
+  // Fetch organization using useAsyncData for SSR optimization
+  const {
+    data: organization,
+    pending: loading,
+    refresh: fetchOrg,
+  } = useAsyncData(`admin-org-${orgId}`, async () => {
+    const result = await authClient.organization.getFullOrganization({
+      query: { organizationId: orgId },
+    });
+    return result.data;
+  });
 
   const updateOrg = async (updates: OrganizationUpdateData) => {
     if (!organization.value) return;
@@ -64,10 +48,8 @@ export const useAdminOrg = (orgId: string) => {
       throw new Error(result.error.message || "Failed to update organization");
     }
 
-    // Immediate local state update
-    if (organization.value) {
-      Object.assign(organization.value, updateData);
-    }
+    // Refresh data from server
+    await fetchOrg();
   };
 
   // Delete organization
@@ -100,9 +82,8 @@ export const useAdminOrg = (orgId: string) => {
   };
 
   return {
-    organization: readonly(organization),
-    loading: readonly(loading),
-    error: readonly(error),
+    organization,
+    loading,
     fetchOrg,
     updateOrg,
     deleteOrg,

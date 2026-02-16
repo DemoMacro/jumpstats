@@ -2,32 +2,28 @@ import type { Member } from "better-auth/plugins";
 import { authClient } from "~/utils/auth";
 
 export const useOrgMembers = (orgId: string) => {
-  const members = ref<Member[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
-
-  const fetchMembers = async () => {
-    loading.value = true;
-    error.value = null;
-
-    try {
+  // Fetch members using useAsyncData for SSR optimization
+  const {
+    data: membersData,
+    pending: loading,
+    refresh: fetchMembers,
+  } = useAsyncData(
+    `org-members-${orgId}`,
+    async () => {
       const result = await authClient.organization.listMembers({
         query: {
           organizationId: orgId,
           limit: 1000, // Get all members for admin view
         },
       });
+      return result.data;
+    },
+    {
+      transform: (data) => data?.members ?? [],
+    },
+  );
 
-      if (result.data) {
-        members.value = result.data.members;
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to fetch members";
-      members.value = [];
-    } finally {
-      loading.value = false;
-    }
-  };
+  const members = computed(() => membersData.value ?? []);
 
   const inviteMember = async (
     email: string,
@@ -50,13 +46,9 @@ export const useOrgMembers = (orgId: string) => {
       await fetchMembers();
       return result;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to invite member";
       throw err;
     }
   };
-
-  // Note: Member role update would require custom server implementation
-  // as Better-Auth doesn't provide direct role update API
 
   const removeMember = async (memberId: string) => {
     try {
@@ -69,10 +61,9 @@ export const useOrgMembers = (orgId: string) => {
         throw new Error(result.error.message || "Failed to remove member");
       }
 
-      // Remove from local state immediately
-      members.value = members.value.filter((m) => m.id !== memberId);
+      // Refresh members list to get updated data
+      await fetchMembers();
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to remove member";
       throw err;
     }
   };
@@ -90,15 +81,13 @@ export const useOrgMembers = (orgId: string) => {
       // This would typically trigger a navigation or state change
       // as the user is no longer a member of this organization
     } catch (err) {
-      error.value = err instanceof Error ? err.message : "Failed to leave organization";
       throw err;
     }
   };
 
   return {
-    members: readonly(members),
-    loading: readonly(loading),
-    error: readonly(error),
+    members,
+    loading,
     fetchMembers,
     inviteMember,
     removeMember,
