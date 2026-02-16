@@ -28,7 +28,7 @@ const toast = useToast();
 const searchValue = ref("");
 
 // Use composable for session data with reactive search
-const { sessions, loading, fetchSessions, revokeUserSessions } = useAdminSessions(searchValue);
+const { sessions, loading, fetchSessions, revokeUserSessions } = useSessions(searchValue);
 
 const total = computed(() => sessions.value.length);
 

@@ -18,6 +18,9 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    future: {
+      nativeSWR: true,
+    },
     prerender: {
       routes: ["/", "/privacy", "/terms"],
     },

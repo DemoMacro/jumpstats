@@ -1,6 +1,6 @@
 import { authClient } from "~/utils/auth";
 
-export const useAdminSessions = (searchValue?: Ref<string>) => {
+export const useSessions = (searchValue?: Ref<string>) => {
   // Fetch sessions using useAsyncData for SSR optimization
   const {
     data: sessionsData,

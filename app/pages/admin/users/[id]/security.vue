@@ -7,7 +7,7 @@ const userId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for user data
-const { user, loading, updateUser, banUser, unbanUser, removeUser } = useAdminUser(userId);
+const { user, loading, updateUser, banUser, unbanUser, removeUser } = useUser(userId);
 
 // Password form schema
 const passwordSchema = z

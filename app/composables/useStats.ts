@@ -1,6 +1,6 @@
 import { authClient } from "~/utils/auth";
 
-export const useAdminStats = () => {
+export const useStats = () => {
   // Fetch stats using useAsyncData for SSR optimization
   const {
     data: statsData,

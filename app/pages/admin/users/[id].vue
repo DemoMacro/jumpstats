@@ -10,7 +10,7 @@ const route = useRoute();
 const userId = route.params.id as string;
 
 // Use composable for user data
-const { user, loading } = useAdminUser(userId);
+const { user, loading } = useUser(userId);
 
 // Navigation items
 const links = [

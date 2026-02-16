@@ -7,7 +7,7 @@ const userId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for user data
-const { user, loading, updateUser } = useAdminUser(userId);
+const { user, loading, updateUser } = useUser(userId);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({

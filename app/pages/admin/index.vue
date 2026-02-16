@@ -13,7 +13,7 @@ interface Stat {
 }
 
 // Use admin stats composable
-const { totalUsers, totalOrgs, adminUsers, activeSessions, loading, fetchStats } = useAdminStats();
+const { totalUsers, totalOrgs, adminUsers, activeSessions, loading, fetchStats } = useStats();
 
 // Define stats data
 const stats = computed<Stat[]>(() => [

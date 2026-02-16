@@ -6,7 +6,7 @@ interface UserUpdateData extends Partial<UserWithRole> {
   newPassword?: string;
 }
 
-export const useAdminUser = (userId: string) => {
+export const useUser = (userId: string) => {
   // Fetch user using useAsyncData for SSR optimization
   const {
     data: userData,
@@ -33,7 +33,7 @@ export const useAdminUser = (userId: string) => {
   const updateUser = async (updates: UserUpdateData) => {
     if (!user.value) return;
 
-    // 更新角色
+    // Update role
     if (updates.role && updates.role !== user.value.role) {
       const result = await authClient.admin.setRole({
         userId: user.value.id,
@@ -45,7 +45,7 @@ export const useAdminUser = (userId: string) => {
       }
     }
 
-    // 更新密码
+    // Update password
     if (updates.newPassword) {
       const result = await authClient.admin.setUserPassword({
         userId: user.value.id,
@@ -57,7 +57,7 @@ export const useAdminUser = (userId: string) => {
       }
     }
 
-    // 使用 Better-Auth 的 updateUser API
+    // Use Better-Auth's updateUser API
     const { email, name, image, emailVerified, banned, banReason, banExpires, ...otherData } =
       updates;
     const updateData = {
@@ -71,7 +71,7 @@ export const useAdminUser = (userId: string) => {
       ...otherData,
     };
 
-    // 移除不应该通过updateUser更新的字段
+    // Remove fields that shouldn't be updated via updateUser
     delete updateData.role;
     delete updateData.newPassword;
     delete updateData.id;
@@ -93,7 +93,7 @@ export const useAdminUser = (userId: string) => {
     await fetchUser();
   };
 
-  // 禁用用户
+  // Ban user
   const banUser = async (banReason?: string, banExpiresIn?: number) => {
     if (!user.value) return;
 
@@ -111,7 +111,7 @@ export const useAdminUser = (userId: string) => {
     await fetchUser();
   };
 
-  // 解禁用户
+  // Unban user
   const unbanUser = async () => {
     if (!user.value) return;
 
@@ -127,7 +127,7 @@ export const useAdminUser = (userId: string) => {
     await fetchUser();
   };
 
-  // 删除用户
+  // Remove user
   const removeUser = async () => {
     if (!user.value) return;
 
@@ -143,7 +143,7 @@ export const useAdminUser = (userId: string) => {
     userData.value = null;
   };
 
-  // 冒充用户
+  // Impersonate user
   const impersonateUser = async () => {
     if (!user.value) return;
 
