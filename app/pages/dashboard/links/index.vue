@@ -135,8 +135,9 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
     },
   ];
 
-  // Only add Created By column in organization mode
-  if (activeOrg.value) {
+  // Add Created By column in organization mode or for global admin
+  const shouldShowCreatedBy = activeOrg.value || session.value?.user?.role === "admin";
+  if (shouldShowCreatedBy) {
     baseColumns.splice(2, 0, {
       accessorKey: "createdBy",
       header: "Created By",
