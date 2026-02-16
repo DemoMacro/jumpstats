@@ -2,6 +2,7 @@
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { useDomains } from "~/composables/useDomains";
+import { useOrganizations } from "~/composables/useOrganizations";
 
 interface Props {
   schema: z.ZodObject<any>;
@@ -18,10 +19,40 @@ const emit = defineEmits<{
 }>();
 
 const { domainOptions, loading: domainsLoading } = useDomains();
+
+// Get user's organizations
+const { organizations, loading: orgsLoading } = useOrganizations();
+
+// Organization options for select
+const organizationOptions = computed(() => [
+  { label: "Personal", value: "personal" },
+  ...organizations.value.map((org) => ({
+    label: org.name,
+    value: org.id,
+  })),
+]);
 </script>
 
 <template>
-  <UPageCard variant="subtle">
+  <UPageCard variant="subtle" class="mb-4">
+    <UFormField
+      name="organizationId"
+      label="Organization"
+      description="Choose whether this link belongs to you personally or to an organization"
+      required
+      class="flex max-sm:flex-col justify-between items-start gap-4"
+    >
+      <USelect
+        v-model="state.organizationId"
+        :items="organizationOptions"
+        :disabled="submitting || orgsLoading"
+        class="w-48"
+        icon="i-lucide-building"
+      />
+    </UFormField>
+
+    <USeparator />
+
     <UFormField
       name="originalUrl"
       label="Destination URL"

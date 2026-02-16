@@ -182,29 +182,20 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             <USeparator />
             <UFormField
               name="role"
-              label="User Role"
-              description="Select the appropriate role for this user."
+              label="Role"
+              description="User role determines access permissions."
               required
               class="flex max-sm:flex-col justify-between items-start gap-4"
             >
-              <div class="w-full space-y-4">
-                <URadioGroup
-                  v-model="state.role"
-                  :items="[
-                    {
-                      label: 'User',
-                      value: 'user',
-                      description: 'Standard user with basic permissions',
-                    },
-                    {
-                      label: 'Admin',
-                      value: 'admin',
-                      description: 'Administrator with full system access',
-                    },
-                  ]"
-                  :disabled="submitting"
-                />
-              </div>
+              <USelect
+                v-model="state.role"
+                :items="[
+                  { label: 'User', value: 'user' },
+                  { label: 'Admin', value: 'admin' },
+                ]"
+                class="w-full"
+                :disabled="submitting"
+              />
             </UFormField>
           </UPageCard>
         </UForm>

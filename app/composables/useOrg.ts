@@ -7,7 +7,7 @@ interface OrganizationUpdateData extends Partial<Organization> {
   newMetadata?: Record<string, any>;
 }
 
-export const useAdminOrg = (orgId: string) => {
+export const useOrg = (orgId: string) => {
   // Fetch organization using useAsyncData for SSR optimization
   const {
     data: organization,

@@ -10,11 +10,8 @@ definePageMeta({
 
 const toast = useToast();
 
-// Get active organization
-const activeOrgResult = authClient.useActiveOrganization();
-const activeOrg = computed(() => activeOrgResult.value.data);
-
 const schema = z.object({
+  organizationId: z.string().optional(),
   originalUrl: z.string().url("Please enter a valid URL"),
   domainId: z.string().optional(),
   title: z.string().max(200).optional(),
@@ -26,6 +23,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
+  organizationId: "personal",
   originalUrl: undefined,
   domainId: "default",
   title: undefined,
@@ -46,7 +44,8 @@ async function createLink(event: FormSubmitEvent<Schema>) {
       description: event.data.description || null,
       status: event.data.status || "active",
       expiresAt: event.data.expiresAt ? new Date(event.data.expiresAt) : null,
-      organizationId: activeOrg.value?.id,
+      organizationId:
+        event.data.organizationId === "personal" ? undefined : event.data.organizationId,
     });
 
     if (result.error) {

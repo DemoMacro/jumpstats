@@ -10,7 +10,7 @@ const route = useRoute();
 const orgId = route.params.id as string;
 
 // Use composable for organization data
-const { organization, loading } = useAdminOrg(orgId);
+const { organization, loading } = useOrg(orgId);
 
 // Navigation items
 const links = [

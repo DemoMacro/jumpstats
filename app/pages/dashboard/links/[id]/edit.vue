@@ -11,6 +11,7 @@ const { link, loading, fetchLink } = useLinkDetail(linkId);
 const toast = useToast();
 
 const schema = z.object({
+  organizationId: z.string().optional(),
   originalUrl: z.string().url("Please enter a valid URL"),
   domainId: z.string().optional(),
   title: z.string().max(200).nullable().optional(),
@@ -21,6 +22,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
+  organizationId: "personal",
   originalUrl: undefined,
   domainId: undefined,
   title: undefined,
@@ -32,6 +34,7 @@ watch(
   () => link.value,
   (newLink) => {
     if (newLink) {
+      state.organizationId = newLink.organizationId || "personal";
       state.originalUrl = newLink.originalUrl;
       state.domainId = newLink.domainId || "default";
       state.title = newLink.title ?? undefined;
@@ -54,6 +57,7 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
       title: event.data.title || null,
       description: event.data.description || null,
       status: event.data.status,
+      organizationId: event.data.organizationId === "personal" ? null : event.data.organizationId,
     });
 
     if (result.error) {

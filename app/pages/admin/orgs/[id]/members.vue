@@ -11,7 +11,7 @@ const route = useRoute();
 const orgId = route.params.id as string;
 
 // Use composables for data
-const { organization, loading: orgLoading } = useAdminOrg(orgId);
+const { organization, loading: orgLoading } = useOrg(orgId);
 const {
   members,
   loading: membersLoading,

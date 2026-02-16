@@ -11,7 +11,7 @@ interface OrganizationCreateData {
   keepCurrentActiveOrganization?: boolean;
 }
 
-export const useAdminOrganizations = (options?: {
+export const useOrganizations = (options?: {
   limit?: number;
   offset?: number;
   searchValue?: string;

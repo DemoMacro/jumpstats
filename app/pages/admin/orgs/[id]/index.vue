@@ -7,7 +7,7 @@ const orgId = route.params.id as string;
 const toast = useToast();
 
 // Use composable for organization data
-const { organization, loading, updateOrg } = useAdminOrg(orgId);
+const { organization, loading, updateOrg } = useOrg(orgId);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
