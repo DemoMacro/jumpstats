@@ -9,10 +9,25 @@ defineProps<{
 
 const toast = useToast();
 
-// Get user's organizations - this returns a reactive result
-const orgsResult = authClient.useListOrganizations();
+// Get current session to track user changes
+const { data: session } = await authClient.useSession(useFetch);
 
-// Get active organization - this returns a reactive result
+// Key for cache busting when session changes
+const sessionKey = computed(() => session.value?.user?.id || "anonymous");
+
+// Fetch organizations with reactive refetch
+const { data: orgs } = await useAsyncData(
+  "organizations",
+  async () => {
+    const result = await authClient.organization.list();
+    return result.data;
+  },
+  {
+    watch: [sessionKey], // Refetch when user changes
+  },
+);
+
+// Use reactive hook for active organization - this will auto-update
 const activeOrgResult = authClient.useActiveOrganization();
 
 // Loading state for switching
@@ -20,7 +35,6 @@ const switching = ref(false);
 
 // Current active entity (personal or organization)
 const currentEntity = computed(() => {
-  // The result is directly the data
   const activeOrg = activeOrgResult.value.data;
   if (activeOrg) {
     return {
@@ -77,14 +91,17 @@ async function switchContext(entityId: string) {
         return;
       }
 
-      const orgs = orgsResult.value.data;
-      const org = orgs?.find((o: Organization) => o.id === entityId);
+      const orgList = orgs.value;
+      const org = orgList?.find((o: Organization) => o.id === entityId);
       toast.add({
         title: "Switched to Organization",
         description: `You are now working in ${org?.name || "the organization"}`,
         color: "success",
       });
     }
+
+    // useActiveOrganization hook will auto-update
+    // useAsyncData with watch will auto-refetch organizations
   } catch (error) {
     toast.add({
       title: "Switch Failed",
@@ -105,9 +122,9 @@ const items = computed<DropdownMenuItem[][]>(() => {
     onSelect: () => switchContext("personal"),
   };
 
-  const orgs = orgsResult.value.data;
+  const orgList = orgs.value;
   const organizationOptions =
-    orgs?.map((org: Organization) => ({
+    orgList?.map((org: Organization) => ({
       label: org.name,
       icon: "i-lucide-building",
       id: org.id,

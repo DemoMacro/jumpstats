@@ -20,6 +20,11 @@ const links = [
       icon: "i-lucide-shield",
       to: "/dashboard/settings/security",
     },
+    {
+      label: "Invitations",
+      icon: "i-lucide-mail",
+      to: "/dashboard/settings/invitations",
+    },
   ],
 ] satisfies NavigationMenuItem[][];
 </script>

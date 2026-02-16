@@ -100,6 +100,11 @@ const items = computed<DropdownMenuItem[][]>(() => {
         icon: "i-lucide-shield",
         onSelect: () => navigateTo("/dashboard/settings/security"),
       },
+      {
+        label: "Invitations",
+        icon: "i-lucide-mail",
+        onSelect: () => navigateTo("/dashboard/settings/invitations"),
+      },
     ],
     [
       {
