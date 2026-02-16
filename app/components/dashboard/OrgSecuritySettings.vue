@@ -8,6 +8,10 @@ interface Props {
 const props = defineProps<Props>();
 const toast = useToast();
 
+const emit = defineEmits<{
+  refresh: [];
+}>();
+
 async function leaveOrganization() {
   if (!props.organization) return;
 
@@ -28,6 +32,8 @@ async function leaveOrganization() {
       icon: "i-lucide-check",
       color: "success",
     });
+
+    emit("refresh");
     await navigateTo("/dashboard");
   }
 }
@@ -42,7 +48,7 @@ async function leaveOrganization() {
       class="bg-linear-to-tl from-error/10 from-5% to-default"
     >
       <template #footer>
-        <DashboardOrgDeleteModal :organization="organization">
+        <DashboardOrgDeleteModal :organization="organization" @refresh="emit('refresh')">
           <UButton label="Delete organization" color="error" icon="i-lucide-trash-2" />
         </DashboardOrgDeleteModal>
       </template>

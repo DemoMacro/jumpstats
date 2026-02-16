@@ -45,6 +45,12 @@ async function fetchOrganization() {
   }
 }
 
+// Handle refresh event from child components
+function handleRefresh() {
+  // Refresh organizations list in OrgsMenu
+  refreshNuxtData("organizations");
+}
+
 // Load organization on mount
 onMounted(() => {
   fetchOrganization();
@@ -71,6 +77,6 @@ onMounted(() => {
   </div>
 
   <div v-else class="space-y-6">
-    <DashboardOrgSecuritySettings :organization="activeOrg" />
+    <DashboardOrgSecuritySettings :organization="activeOrg" @refresh="handleRefresh" />
   </div>
 </template>

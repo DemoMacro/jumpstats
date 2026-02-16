@@ -91,6 +91,9 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
       color: "success",
     });
 
+    // Refresh organizations list in OrgsMenu
+    refreshNuxtData("organizations");
+
     // Redirect to organization overview
     await navigateTo("/dashboard/org");
   } catch (error) {
