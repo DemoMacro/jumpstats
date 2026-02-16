@@ -4,7 +4,6 @@ import {
   type ClickHouseConfig,
   ClickHouseConnection,
   createQueryBuilder,
-  logger,
 } from "@hypequery/clickhouse";
 import type { Database } from "~~/shared/types/database";
 import type { AnalyticsSchema } from "~~/shared/types/analytics";
@@ -18,37 +17,31 @@ export const db = new Kysely<Database>({
   dialect: new PostgresDialect({ pool }),
 });
 
-const chdbConfig: ClickHouseConfig = {
+export const chdbConfig: ClickHouseConfig = {
   url: env.CLICKHOUSE_URL!,
   database: env.CLICKHOUSE_DATABASE!,
   username: env.CLICKHOUSE_USERNAME!,
   password: env.CLICKHOUSE_PASSWORD!,
 };
 
-// Configure hypequery logger to only show warnings and errors
-logger.configure({
-  level: "warn",
-});
+// ClickHouse connection will be initialized in the plugin
+// Lazy load the client - only get it when actually used
+let chdbClientInstance: ReturnType<typeof ClickHouseConnection.getClient> | null = null;
 
-// Initialize with default database first, then create target database
-const defaultConfig: ClickHouseConfig = {
-  ...chdbConfig,
-  database: "default",
+export const getChdbClient = () => {
+  if (!chdbClientInstance) {
+    chdbClientInstance = ClickHouseConnection.getClient();
+  }
+  return chdbClientInstance;
 };
 
-ClickHouseConnection.initialize(defaultConfig);
-const tempClient = ClickHouseConnection.getClient();
+// Export a convenient chdbClient that works like a regular client
+// but lazily initializes on first access
+export const chdbClient = new Proxy({} as ReturnType<typeof ClickHouseConnection.getClient>, {
+  get(target, prop) {
+    const client = getChdbClient();
+    return client[prop as keyof typeof client];
+  },
+});
 
-// Create database if not exists
-tempClient
-  .command({
-    query: `CREATE DATABASE IF NOT EXISTS ${env.CLICKHOUSE_DATABASE}`,
-  })
-  .catch((err: unknown) => {
-    console.error("Failed to create ClickHouse database:", err);
-  });
-
-// Now initialize with the correct database
-ClickHouseConnection.initialize(chdbConfig);
-export const chdbClient = ClickHouseConnection.getClient();
 export const chdb = createQueryBuilder<AnalyticsSchema>(chdbConfig);
