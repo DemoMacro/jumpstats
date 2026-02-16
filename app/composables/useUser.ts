@@ -161,7 +161,7 @@ export const useUser = (userId: string) => {
   return {
     user,
     loading,
-    fetchUser: () => fetchUser(),
+    fetchUser,
     updateUser,
     banUser,
     unbanUser,

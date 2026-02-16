@@ -78,7 +78,10 @@ const {
   "links",
   async () => {
     // Build query based on active organization
-    const query: Record<string, any> = {};
+    const query: Record<string, any> = {
+      limit: pagination.value.pageSize,
+      offset: pagination.value.pageIndex * pagination.value.pageSize,
+    };
     if (activeOrg.value?.id) {
       query.organizationId = activeOrg.value.id;
     }
@@ -93,7 +96,7 @@ const {
       links: data?.links ?? [],
       total: data?.total ?? 0,
     }),
-    watch: [activeOrg], // Re-fetch when active organization changes
+    watch: [activeOrg, () => pagination.value.pageIndex, () => pagination.value.pageSize], // Re-fetch when pagination or active organization changes
   },
 );
 

@@ -9,12 +9,6 @@ definePageMeta({
   title: "Organizations - Admin - JumpStats",
 });
 
-// Page state
-const loading = ref(false);
-const organizations = ref<Organization[]>([]);
-const total = ref(0);
-const searchValue = ref("");
-
 // Table state
 const table = useTemplateRef("table");
 const columnFilters = ref([
@@ -32,11 +26,17 @@ const pagination = ref({
 });
 
 const toast = useToast();
+const searchValue = ref("");
 
-// Fetch organizations
-async function fetchOrganizations() {
-  loading.value = true;
-  try {
+// Fetch organizations using useAsyncData with SSR support
+const {
+  data: orgsData,
+  pending: loading,
+  refresh: fetchOrganizations,
+  error,
+} = await useAsyncData(
+  "admin-organizations",
+  async () => {
     const result = await authClient.organization.list({
       query: {
         limit: pagination.value.pageSize,
@@ -45,43 +45,38 @@ async function fetchOrganizations() {
         sortBy: "name",
       },
     });
+    return result.data;
+  },
+  {
+    transform: (data) => ({
+      organizations: data ?? [],
+      total: data?.length ?? 0,
+    }),
+    watch: [() => pagination.value.pageIndex, () => pagination.value.pageSize, searchValue],
+  },
+);
 
-    if (result.data) {
-      organizations.value = result.data;
-      total.value = result.data.length;
-    }
-  } catch (error) {
+const organizations = computed(() => orgsData.value?.organizations ?? []);
+const total = computed(() => orgsData.value?.total ?? 0);
+
+// Watch for errors and display toast notification
+watch(error, (newError) => {
+  if (newError) {
     toast.add({
       title: "Error",
       description: "Failed to fetch organizations",
       color: "error",
     });
-  } finally {
-    loading.value = false;
   }
-}
+});
 
-// Watch for search changes
+// Watch for search changes - sync search input with searchValue
 watch(
   () => columnFilters.value[0]?.value,
-  () => {
-    fetchOrganizations();
+  (newValue) => {
+    searchValue.value = newValue || "";
   },
 );
-
-// Watch for pagination changes
-watch(
-  pagination,
-  () => {
-    fetchOrganizations();
-  },
-  { deep: true },
-);
-
-// Load data on mount
-onMounted(() => {
-  fetchOrganizations();
-});
 
 // Table columns
 const columns: TableColumn<Organization>[] = [

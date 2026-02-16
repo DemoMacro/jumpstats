@@ -9,12 +9,6 @@ definePageMeta({
   title: "Users - Admin - JumpStats",
 });
 
-// Page state
-const loading = ref(false);
-const users = ref<UserWithRole[]>([]);
-const total = ref(0);
-const searchValue = ref("");
-
 // Table state
 const table = useTemplateRef("table");
 const columnFilters = ref([
@@ -32,11 +26,17 @@ const pagination = ref({
 });
 
 const toast = useToast();
+const searchValue = ref("");
 
-// Fetch users
-async function fetchUsers() {
-  loading.value = true;
-  try {
+// Fetch users using useAsyncData with SSR support
+const {
+  data: usersData,
+  pending: loading,
+  refresh: fetchUsers,
+  error,
+} = await useAsyncData(
+  "admin-users",
+  async () => {
     const result = await authClient.admin.listUsers({
       query: {
         limit: pagination.value.pageSize,
@@ -45,43 +45,38 @@ async function fetchUsers() {
         sortBy: "role",
       },
     });
+    return result.data;
+  },
+  {
+    transform: (data) => ({
+      users: data?.users ?? [],
+      total: data?.total ?? 0,
+    }),
+    watch: [() => pagination.value.pageIndex, () => pagination.value.pageSize, searchValue],
+  },
+);
 
-    if (result.data) {
-      users.value = result.data.users;
-      total.value = result.data.total;
-    }
-  } catch (error) {
+const users = computed(() => usersData.value?.users ?? []);
+const total = computed(() => usersData.value?.total ?? 0);
+
+// Watch for errors and display toast notification
+watch(error, (newError) => {
+  if (newError) {
     toast.add({
       title: "Error",
       description: "Failed to fetch users",
       color: "error",
     });
-  } finally {
-    loading.value = false;
   }
-}
+});
 
-// Watch for search changes
+// Watch for search changes - sync search input with searchValue
 watch(
   () => columnFilters.value[0]?.value,
-  () => {
-    fetchUsers();
+  (newValue) => {
+    searchValue.value = newValue || "";
   },
 );
-
-// Watch for pagination changes
-watch(
-  pagination,
-  () => {
-    fetchUsers();
-  },
-  { deep: true },
-);
-
-// Load data on mount
-onMounted(() => {
-  fetchUsers();
-});
 
 // Table columns
 const columns: TableColumn<UserWithRole>[] = [

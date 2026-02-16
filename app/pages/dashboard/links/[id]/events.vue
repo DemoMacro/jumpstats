@@ -95,6 +95,7 @@ const {
       limit: data?.limit ?? 50,
       offset: data?.offset ?? 0,
     }),
+    watch: [() => pagination.value.pageIndex, () => pagination.value.pageSize, rangeRef], // Re-fetch when pagination or range changes
   },
 );
 
@@ -111,15 +112,6 @@ watch(error, (newError) => {
     });
   }
 });
-
-// Watch for pagination changes to refetch data
-watch(
-  () => [pagination.value.pageIndex, pagination.value.pageSize, rangeRef.value],
-  () => {
-    fetchEvents();
-  },
-  { deep: true },
-);
 
 // Bot badge component
 const BotBadge = {
