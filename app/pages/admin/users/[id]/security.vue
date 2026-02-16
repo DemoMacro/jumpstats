@@ -409,9 +409,9 @@ onMounted(() => {
             <UIcon name="i-lucide-user-check" class="mr-2" />
             Unban User
           </UButton>
-          <AdminUsersDeleteModal :user="user">
+          <DashboardUserDeleteModal :user="user">
             <UButton label="Delete account" color="error" />
-          </AdminUsersDeleteModal>
+          </DashboardUserDeleteModal>
         </div>
       </div>
     </UPageCard>

@@ -67,59 +67,10 @@ onMounted(() => {
     <p class="text-muted-foreground mb-4">
       Please select an organization from the menu or create a new one.
     </p>
-    <UButton to="/dashboard/org/create">Create Organization</UButton>
+    <UButton to="/dashboard/create-org">Create Organization</UButton>
   </div>
 
   <div v-else class="space-y-6">
-    <!-- Delete Organization Section -->
-    <UPageCard
-      title="Delete Organization"
-      description="No longer want to use this organization? You can delete it here. This action is not reversible - all information related to this organization will be deleted permanently."
-      class="bg-gradient-to-tl from-error/10 from-5% to-default"
-    >
-      <template #footer>
-        <AdminOrgsDeleteModal :organization="activeOrg">
-          <UButton label="Delete organization" color="error" icon="i-lucide-trash-2" />
-        </AdminOrgsDeleteModal>
-      </template>
-    </UPageCard>
-
-    <!-- Leave Organization Section -->
-    <UPageCard
-      title="Leave Organization"
-      description="Want to leave this organization? You can remove yourself from this organization. If you're the only owner, you'll need to delete the organization instead."
-    >
-      <template #footer>
-        <UButton
-          label="Leave organization"
-          color="neutral"
-          variant="outline"
-          icon="i-lucide-log-out"
-          @click="
-            async () => {
-              if (!activeOrg) return;
-              const result = await authClient.organization.leave({
-                organizationId: activeOrg.id,
-              });
-              if (result.error) {
-                toast.add({
-                  title: 'Error',
-                  description: result.error.message || 'Failed to leave organization',
-                  color: 'error',
-                });
-              } else {
-                toast.add({
-                  title: 'Success',
-                  description: 'You have left the organization',
-                  icon: 'i-lucide-check',
-                  color: 'success',
-                });
-                await navigateTo('/dashboard');
-              }
-            }
-          "
-        />
-      </template>
-    </UPageCard>
+    <DashboardOrgSecuritySettings :organization="activeOrg" />
   </div>
 </template>

@@ -275,14 +275,14 @@ const columns: TableColumn<UserWithRole>[] = [
                 />
 
                 <!-- Delete (Keep as Modal for dangerous action) -->
-                <AdminUsersDeleteModal :user="row.original" @refresh="fetchUsers">
+                <DashboardUserDeleteModal :user="row.original" @refresh="fetchUsers">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
                     title="Delete User"
                   />
-                </AdminUsersDeleteModal>
+                </DashboardUserDeleteModal>
               </div>
             </template>
           </UTable>

@@ -17,6 +17,7 @@ const schema = z.object({
     .string()
     .min(4, "Slug is required")
     .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  logo: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
 type Schema = z.output<typeof schema>;
@@ -25,6 +26,7 @@ type Schema = z.output<typeof schema>;
 const state = reactive<Schema>({
   name: "",
   slug: "",
+  logo: "",
 });
 
 const submitting = ref(false);
@@ -75,6 +77,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
     const result = await authClient.organization.create({
       name: event.data.name,
       slug: event.data.slug,
+      logo: event.data.logo || undefined,
     });
 
     if (result.error) {
@@ -148,36 +151,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
           </UPageCard>
 
           <UPageCard variant="subtle">
-            <UFormField
-              name="name"
-              label="Organization Name"
-              description="The display name for your organization."
-              required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UInput
-                v-model="state.name"
-                placeholder="Acme Corp"
-                autocomplete="off"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
-            <UFormField
-              name="slug"
-              label="Slug"
-              description="Unique identifier used in URLs and API calls."
-              required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UInput
-                v-model="state.slug"
-                placeholder="acme-corp"
-                autocomplete="off"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
+            <DashboardOrgForm :schema="schema" :state="state" :submitting="submitting" />
           </UPageCard>
         </UForm>
       </div>

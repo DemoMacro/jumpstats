@@ -209,14 +209,14 @@ const columns: TableColumn<Organization>[] = [
                 />
 
                 <!-- Delete (Keep as Modal for dangerous action) -->
-                <AdminOrgsDeleteModal :organization="row.original" @refresh="fetchOrganizations">
+                <DashboardOrgDeleteModal :organization="row.original" @refresh="fetchOrganizations">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
                     title="Delete Organization"
                   />
-                </AdminOrgsDeleteModal>
+                </DashboardOrgDeleteModal>
               </div>
             </template>
           </UTable>

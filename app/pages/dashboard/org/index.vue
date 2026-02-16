@@ -19,19 +19,17 @@ const profileSchema = z.object({
     .min(4, "Too short")
     .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
   logo: z.string().url("Invalid URL").optional().or(z.literal("")),
-  metadata: z.string().optional(),
 });
 
 type ProfileSchema = z.output<typeof profileSchema>;
 
 // Form state derived from organization data
 const profile = computed(() => {
-  if (!activeOrg.value) return { name: "", slug: "", logo: "", metadata: "" };
+  if (!activeOrg.value) return { name: "", slug: "", logo: "" };
   return {
     name: activeOrg.value.name || "",
     slug: activeOrg.value.slug || "",
     logo: activeOrg.value.logo || "",
-    metadata: activeOrg.value.metadata ? JSON.stringify(activeOrg.value.metadata, null, 2) : "",
   };
 });
 
@@ -41,14 +39,11 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
   loading.value = true;
   try {
-    const metadata = event.data.metadata ? JSON.parse(event.data.metadata) : undefined;
-
     const { error: err } = await authClient.organization.update({
       data: {
         name: event.data.name,
         slug: event.data.slug,
         logo: event.data.logo || undefined,
-        metadata,
       },
     });
 
@@ -85,7 +80,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
     <p class="text-muted-foreground mb-4">
       Please select an organization from the menu or create a new one.
     </p>
-    <UButton to="/dashboard/org/create">Create Organization</UButton>
+    <UButton to="/dashboard/create-org">Create Organization</UButton>
   </div>
 
   <div v-else>
@@ -108,55 +103,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
       </UPageCard>
 
       <UPageCard variant="subtle">
-        <UFormField
-          name="name"
-          label="Name"
-          description="Will appear on receipts, invoices, and other communication."
-          required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UInput v-model="profile.name" autocomplete="off" :disabled="loading" />
-        </UFormField>
-        <USeparator />
-        <UFormField
-          name="slug"
-          label="Slug"
-          description="Unique identifier used in URLs and API calls."
-          required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UInput v-model="profile.slug" autocomplete="off" :disabled="loading" />
-        </UFormField>
-        <USeparator />
-        <UFormField
-          name="logo"
-          label="Logo URL"
-          description="Organization logo image URL."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UInput
-            v-model="profile.logo"
-            type="url"
-            placeholder="https://example.com/logo.png"
-            autocomplete="off"
-            :disabled="loading"
-          />
-        </UFormField>
-        <USeparator />
-        <UFormField
-          name="metadata"
-          label="Metadata"
-          description="Additional metadata in JSON format."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UTextarea
-            v-model="profile.metadata"
-            placeholder='{"customField": "value"}'
-            :rows="4"
-            :disabled="loading"
-          />
-        </UFormField>
-        <USeparator />
+        <DashboardOrgForm :schema="profileSchema" :state="profile" :submitting="loading" />
       </UPageCard>
     </UForm>
   </div>

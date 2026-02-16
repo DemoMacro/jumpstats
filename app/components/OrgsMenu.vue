@@ -120,7 +120,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
       {
         label: "Create organization",
         icon: "i-lucide-circle-plus",
-        disabled: true, // TODO: Implement create organization feature
+        onSelect: () => navigateTo("/dashboard/create-org"),
       },
     ],
   ];

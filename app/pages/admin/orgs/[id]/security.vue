@@ -24,17 +24,6 @@ const { organization, loading } = useAdminOrg(orgId);
   </div>
 
   <div v-else>
-    <!-- Account Section -->
-    <UPageCard
-      title="Account"
-      description="No longer want to use our service? You can delete this organization here. This action is not reversible. All information related to this organization will be deleted permanently."
-      class="bg-linear-to-tl from-error/10 from-5% to-default"
-    >
-      <template #footer>
-        <AdminOrgsDeleteModal :organization="organization">
-          <UButton label="Delete organization" color="error" />
-        </AdminOrgsDeleteModal>
-      </template>
-    </UPageCard>
+    <DashboardOrgSecuritySettings :organization="organization" />
   </div>
 </template>

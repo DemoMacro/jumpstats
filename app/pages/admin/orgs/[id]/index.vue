@@ -16,16 +16,18 @@ const profileSchema = z.object({
     .string()
     .min(4, "Too short")
     .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  logo: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
 type ProfileSchema = z.output<typeof profileSchema>;
 
 // Form state derived from organization data
 const profile = computed(() => {
-  if (!organization.value) return { name: "", slug: "" };
+  if (!organization.value) return { name: "", slug: "", logo: "" };
   return {
     name: organization.value.name || "",
     slug: organization.value.slug || "",
+    logo: organization.value.logo || "",
   };
 });
 
@@ -83,25 +85,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
       </UPageCard>
 
       <UPageCard variant="subtle">
-        <UFormField
-          name="name"
-          label="Name"
-          description="Will appear on receipts, invoices, and other communication."
-          required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UInput v-model="profile.name" autocomplete="off" />
-        </UFormField>
-        <USeparator />
-        <UFormField
-          name="slug"
-          label="Slug"
-          description="Unique identifier used in URLs and API calls."
-          required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
-        >
-          <UInput v-model="profile.slug" autocomplete="off" />
-        </UFormField>
+        <DashboardOrgForm :schema="profileSchema" :state="profile" :submitting="loading" />
       </UPageCard>
     </UForm>
   </div>

@@ -227,15 +227,15 @@ const columns: TableColumn<Domain>[] = [
                   </template>
                 </UPopover>
 
-                <DashboardDomainsVerifyModal
+                <DashboardDomainVerifyModal
                   v-if="row.original.status === 'pending'"
                   :domain="row.original"
                   @refresh="fetchDomains"
                 >
                   <UButton variant="ghost" icon="i-lucide-refresh-cw" title="Verify Domain" />
-                </DashboardDomainsVerifyModal>
+                </DashboardDomainVerifyModal>
 
-                <DashboardDomainsDeleteModal :domain="row.original" @refresh="fetchDomains">
+                <DashboardDomainDeleteModal :domain="row.original" @refresh="fetchDomains">
                   <UButton
                     variant="ghost"
                     icon="i-lucide-trash"
@@ -243,7 +243,7 @@ const columns: TableColumn<Domain>[] = [
                     title="Delete Domain"
                     :disabled="row.original.status === 'active'"
                   />
-                </DashboardDomainsDeleteModal>
+                </DashboardDomainDeleteModal>
               </div>
             </template>
           </UTable>

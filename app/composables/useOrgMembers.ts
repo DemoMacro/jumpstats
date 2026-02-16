@@ -59,6 +59,22 @@ export const useOrgMembers = (orgId: string) => {
     await fetchMembers();
   };
 
+  const updateMemberRole = async (memberId: string, role: string) => {
+    const result = await authClient.organization.updateMemberRole({
+      memberId,
+      role,
+      organizationId: orgId,
+    });
+
+    if (result.error) {
+      throw new Error(result.error.message || "Failed to update member role");
+    }
+
+    // Refresh members list to get updated data
+    await fetchMembers();
+    return result;
+  };
+
   const leaveOrganization = async () => {
     const result = await authClient.organization.leave({
       organizationId: orgId,
@@ -78,6 +94,7 @@ export const useOrgMembers = (orgId: string) => {
     fetchMembers,
     inviteMember,
     removeMember,
+    updateMemberRole,
     leaveOrganization,
   };
 };

@@ -17,7 +17,6 @@ const schema = z.object({
     .min(4, "Slug is required")
     .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
   logo: z.string().url("Invalid URL").optional().or(z.literal("")),
-  metadata: z.string().optional(),
 });
 
 type Schema = z.output<typeof schema>;
@@ -27,7 +26,6 @@ const state = reactive<Schema>({
   name: "",
   slug: "",
   logo: "",
-  metadata: "",
 });
 
 const submitting = ref(false);
@@ -71,13 +69,10 @@ watch(
 async function createOrganization(event: FormSubmitEvent<Schema>) {
   submitting.value = true;
   try {
-    const metadata = event.data.metadata ? JSON.parse(event.data.metadata) : undefined;
-
     const result = await authClient.organization.create({
       name: event.data.name,
       slug: event.data.slug,
       logo: event.data.logo || undefined,
-      metadata,
     });
 
     if (result.error) {
@@ -152,65 +147,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
           </UPageCard>
 
           <UPageCard variant="subtle">
-            <UFormField
-              name="name"
-              label="Organization Name"
-              description="The display name for your organization."
-              required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UInput
-                v-model="state.name"
-                placeholder="Acme Corp"
-                autocomplete="off"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
-            <UFormField
-              name="slug"
-              label="Slug"
-              description="Unique identifier used in URLs and API calls."
-              required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UInput
-                v-model="state.slug"
-                placeholder="acme-corp"
-                autocomplete="off"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
-            <UFormField
-              name="logo"
-              label="Logo URL"
-              description="Organization logo image URL."
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UInput
-                v-model="state.logo"
-                type="url"
-                placeholder="https://example.com/logo.png"
-                autocomplete="off"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
-            <UFormField
-              name="metadata"
-              label="Metadata"
-              description="Additional metadata in JSON format."
-              class="flex max-sm:flex-col justify-between items-start gap-4"
-            >
-              <UTextarea
-                v-model="state.metadata"
-                placeholder='{"customField": "value"}'
-                :rows="4"
-                :disabled="submitting"
-              />
-            </UFormField>
-            <USeparator />
+            <DashboardOrgForm :schema="schema" :state="state" :submitting="submitting" />
           </UPageCard>
         </UForm>
       </div>
