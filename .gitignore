@@ -151,3 +151,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Wrangler
+.wrangler
