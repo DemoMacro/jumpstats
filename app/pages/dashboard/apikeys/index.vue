@@ -304,12 +304,16 @@ const columns: TableColumn<any>[] = [
 
         <!-- Info Section -->
         <div class="border-t border-default pt-4">
-          <UAlert
-            icon="i-lucide-info"
-            color="neutral"
-            title="How to use API Keys"
-            description="Include your API key in the 'x-api-key' header when making requests."
-          />
+          <UAlert icon="i-lucide-info" color="neutral" title="How to use API Keys">
+            <template #description>
+              <span class="inline"
+                >Include your API key in the 'x-api-key' header when making requests.
+              </span>
+              <NuxtLink to="/api/reference" target="_blank" class="inline hover:underline">
+                View API Documentation →
+              </NuxtLink>
+            </template>
+          </UAlert>
         </div>
       </div>
     </template>

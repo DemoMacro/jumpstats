@@ -145,19 +145,6 @@ const items = [
           </UButton>
         </UPageGrid>
       </UPageCard>
-
-      <UPageCard>
-        <template #header>
-          <h3 class="text-lg font-semibold">Recent Activity</h3>
-          <p class="text-sm text-muted-foreground">Latest platform activities</p>
-        </template>
-
-        <div class="text-muted-foreground text-center py-8">
-          <UIcon name="i-lucide-clock" class="size-12 mx-auto mb-4 opacity-50" />
-          <p>No recent activity to display.</p>
-          <p class="text-sm">Activity will appear here as users interact with the platform.</p>
-        </div>
-      </UPageCard>
     </template>
   </UDashboardPanel>
 </template>
