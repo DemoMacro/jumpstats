@@ -24,6 +24,9 @@ export default defineNuxtConfig({
     prerender: {
       routes: ["/", "/privacy", "/terms"],
     },
+    rollupConfig: {
+      external: ["pg-native", "cloudflare:sockets", "@react-email/render"],
+    },
   },
 
   modules: ["@nuxt/ui", "@vueuse/nuxt", "@nuxtjs/i18n", "@nuxt/content"],
