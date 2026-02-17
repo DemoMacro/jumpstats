@@ -1,10 +1,7 @@
 import { Pool } from "pg";
 import { Kysely, PostgresDialect } from "kysely";
-import {
-  type ClickHouseConfig,
-  ClickHouseConnection,
-  createQueryBuilder,
-} from "@hypequery/clickhouse";
+import { createClient } from "@clickhouse/client-web";
+import { type ClickHouseConfig, createQueryBuilder } from "@hypequery/clickhouse";
 import type { Database } from "~~/shared/types/database";
 import type { AnalyticsSchema } from "~~/shared/types/analytics";
 import { env } from "std-env";
@@ -24,25 +21,33 @@ export const chdbConfig: ClickHouseConfig = {
   password: env.CLICKHOUSE_PASSWORD!,
 };
 
-// ClickHouse connection will be initialized in the plugin
-// Lazy load the client - only get it when actually used
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-let chdbClientInstance: ReturnType<typeof ClickHouseConnection.getClient> | null = null;
+// ClickHouse client using @clickhouse/client-web
+// Lazy load the client - only create when actually used
+let chdbClientInstance: ReturnType<typeof createClient> | null = null;
 
-export const getChdbClient = () => {
+const createChdbClient = () => {
   if (!chdbClientInstance) {
-    chdbClientInstance = ClickHouseConnection.getClient();
+    chdbClientInstance = createClient({
+      url: chdbConfig.url,
+      username: chdbConfig.username,
+      password: chdbConfig.password,
+      database: chdbConfig.database,
+    });
   }
   return chdbClientInstance;
 };
 
 // Export a convenient chdbClient that works like a regular client
 // but lazily initializes on first access
-export const chdbClient = new Proxy({} as ReturnType<typeof ClickHouseConnection.getClient>, {
+export const chdbClient = new Proxy({} as ReturnType<typeof createClient>, {
   get(target, prop) {
-    const client = getChdbClient();
+    const client = createChdbClient();
     return client[prop as keyof typeof client];
   },
 });
 
-export const chdb = createQueryBuilder<AnalyticsSchema>(chdbConfig);
+// Create query builder with client instance for web/worker environment
+// This allows @hypequery/clickhouse to work with @clickhouse/client-web
+export const chdb = createQueryBuilder<AnalyticsSchema>({
+  client: chdbClient,
+});

@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@better-auth/cli": "1.5.0-beta.13",
+    "@clickhouse/client-web": "1.17.0",
     "@funish/basis": "0.1.2",
     "@hypequery/clickhouse": "1.5.0",
     "@iconify-json/lucide": "1.2.89",

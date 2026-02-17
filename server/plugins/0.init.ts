@@ -2,7 +2,8 @@ import { chdbClient, chdbConfig } from "~~/server/utils/database";
 import { getMigrations } from "better-auth/db/migration";
 import { authConfig } from "~~/server/utils/auth";
 import { db } from "~~/server/utils/database";
-import { ClickHouseConfig, ClickHouseConnection, logger } from "@hypequery/clickhouse";
+import { createClient } from "@clickhouse/client-web";
+import { logger } from "@hypequery/clickhouse";
 
 export default defineNitroPlugin(async () => {
   console.log("🚀 Initializing database connections...");
@@ -68,26 +69,18 @@ export default defineNitroPlugin(async () => {
       level: "warn",
     });
 
-    // Initialize with default database first, then create target database
-    const defaultConfig: ClickHouseConfig = {
-      ...chdbConfig,
+    // Create a temporary client to connect to default database
+    const tempClient = createClient({
+      url: chdbConfig.url,
+      username: chdbConfig.username,
+      password: chdbConfig.password,
       database: "default",
-    };
-
-    ClickHouseConnection.initialize(defaultConfig);
-    const tempClient = ClickHouseConnection.getClient();
+    });
 
     // Create database if not exists
-    await tempClient
-      .command({
-        query: `CREATE DATABASE IF NOT EXISTS ${chdbConfig.database}`,
-      })
-      .catch((err: unknown) => {
-        console.error("Failed to create ClickHouse database:", err);
-      });
-
-    // Now initialize with the correct database
-    ClickHouseConnection.initialize(chdbConfig);
+    await tempClient.command({
+      query: `CREATE DATABASE IF NOT EXISTS ${chdbConfig.database}`,
+    });
 
     console.log("✅ ClickHouse connection initialized successfully");
 

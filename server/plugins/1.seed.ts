@@ -13,27 +13,15 @@ const defaultAdminConfig = {
 };
 
 export default defineNitroPlugin(async () => {
-  // ==========================================
-  // Initialize admin user
-  // ==========================================
-  try {
-    console.log("🔐 Checking admin user...");
+  setTimeout(async () => {
+    // ==========================================
+    // Initialize admin user
+    // ==========================================
+    try {
+      console.log("🔐 Initializing admin user...");
 
-    // First, check if an admin user already exists
-    const existingUsers = await auth.api.listUsers({
-      query: {
-        filterField: "role",
-        filterValue: "admin",
-        filterOperator: "eq",
-        limit: 1,
-      },
-    });
-
-    if (existingUsers?.users && existingUsers.users.length > 0) {
-      console.log("ℹ️ Admin user already exists, skipping initialization");
-    } else {
-      // No admin user exists, create one
-      console.log("📝 Creating admin user...");
+      // Try to create admin user directly
+      // If it already exists, the error will be caught and handled
       const result = await auth.api.createUser({
         body: {
           email: defaultAdminConfig.email,
@@ -51,16 +39,14 @@ export default defineNitroPlugin(async () => {
         console.log("✅ Admin user initialized successfully");
         console.log(`   Email: ${defaultAdminConfig.email}`);
         console.log(`   Username: ${defaultAdminConfig.username}`);
+      }
+    } catch (error) {
+      // Check if it's a "user already exists" error
+      if (String(error).includes("User already exists")) {
+        console.log("ℹ️ Admin user already exists, skipping initialization");
       } else {
-        console.error("❌ Admin user creation failed: No user returned");
+        console.error("❌ Failed to initialize admin user:", error);
       }
     }
-  } catch (error) {
-    // Check if it's a "user already exists" error
-    if (String(error).includes("User already exists")) {
-      console.log("ℹ️ Admin user already exists, skipping initialization");
-    } else {
-      console.error("❌ Failed to initialize admin user:", error);
-    }
-  }
+  }, 1000);
 });
