@@ -75,7 +75,6 @@ export default defineNuxtConfig({
       const { authConfig: betterAuthConfig } = await import("./server/utils/auth");
       const { db } = await import("./server/utils/database");
       const { createClient } = await import("@clickhouse/client-web");
-      const { logger } = await import("@hypequery/clickhouse");
       const { auth } = await import("./server/utils/auth");
       const { env } = await import("std-env");
 
@@ -131,10 +130,6 @@ export default defineNuxtConfig({
       // 3. Initialize ClickHouse
       // ==========================================
       try {
-        logger.configure({
-          level: "warn",
-        });
-
         const tempClient = createClient({
           url: chdbConfig.url,
           username: chdbConfig.username,
