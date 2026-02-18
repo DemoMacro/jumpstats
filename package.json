@@ -23,7 +23,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "basis lint --all",
-    "db": "better-auth migrate --config ./server/utils/auth/index.ts -y",
+    "db": "bun scripts/migrate.ts",
     "postinstall": "nuxt prepare && basis git setup"
   },
   "devDependencies": {

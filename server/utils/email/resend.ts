@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 import { env } from "std-env";
 
-const resend = new Resend(env.RESEND_API_KEY);
-
 /**
  * Send email verification email using Resend
  */
@@ -14,6 +12,7 @@ export async function sendEmailVerification({
   url: string;
 }) {
   try {
+    const resend = new Resend(env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: env.RESEND_FROM_EMAIL || "JumpStats <noreply@js.gs>",
       to: user.email,

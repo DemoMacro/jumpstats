@@ -59,6 +59,18 @@ bun run build
 bun run preview
 ```
 
+#### Docker Deployment
+
+```bash
+# Build Docker image
+docker build -t jumpstats .
+
+# Run container
+docker run -p 3000:3000 \
+  --env-file .env \
+  jumpstats
+```
+
 ## Support & Community
 
 - 📫 [Report Issues](https://github.com/DemoMacro/JumpStats/issues)
