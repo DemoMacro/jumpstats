@@ -54,6 +54,7 @@
     "oxlint-tsgolint": "0.14.0",
     "pg": "8.18.0",
     "resend": "6.9.2",
+    "reserved-usernames": "1.1.6",
     "ua-parser-js": "2.0.9",
     "undns": "0.0.11",
     "uqr": "0.1.2",

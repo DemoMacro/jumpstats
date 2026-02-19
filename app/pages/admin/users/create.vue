@@ -14,7 +14,14 @@ const toast = useToast();
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   name: z.string().min(1, "Name is required"),
-  username: z.string().min(1, "Username is required"),
+  username: z
+    .string()
+    .min(5, "Username must be at least 5 characters")
+    .max(30, "Username must be at most 30 characters")
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, underscores, and hyphens",
+    ),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["user", "admin"]).refine((val) => val !== undefined, {
     message: "Please select a role",

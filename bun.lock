@@ -32,6 +32,7 @@
         "oxlint-tsgolint": "0.14.0",
         "pg": "8.18.0",
         "resend": "6.9.2",
+        "reserved-usernames": "1.1.6",
         "ua-parser-js": "2.0.9",
         "undns": "0.0.11",
         "uqr": "0.1.2",
@@ -2473,6 +2474,8 @@
     "require-directory": ["require-directory@2.1.1", "", {}, "sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q=="],
 
     "resend": ["resend@6.9.2", "", { "dependencies": { "postal-mime": "2.7.3", "svix": "1.84.1" }, "peerDependencies": { "@react-email/render": "*" }, "optionalPeers": ["@react-email/render"] }, "sha512-uIM6CQ08tS+hTCRuKBFbOBvHIGaEhqZe8s4FOgqsVXSbQLAhmNWpmUhG3UAtRnmcwTWFUqnHa/+Vux8YGPyDBA=="],
+
+    "reserved-usernames": ["reserved-usernames@1.1.6", "", {}, "sha512-VIhGkrvJyUIuff2vMO+nz7Y46/qc0Jxqo15bO+mhgv1f4jntbtUA9w4iv3nKwrIZz6so5TUEJl//ug+EheHk1A=="],
 
     "resolve": ["resolve@1.22.11", "", { "dependencies": { "is-core-module": "^2.16.1", "path-parse": "^1.0.7", "supports-preserve-symlinks-flag": "^1.0.0" }, "bin": { "resolve": "bin/resolve" } }, "sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ=="],
 

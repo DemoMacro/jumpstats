@@ -7,6 +7,7 @@ import { env } from "std-env";
 import { sendEmailVerification } from "../email/resend";
 import { cacheStorage } from "../../../shared/utils/storage";
 import { toNumber, isValidIP } from "ipdo";
+import reservedUsernames from "reserved-usernames";
 
 /**
  * Normalize better-auth secondary storage keys for unstorage compatibility
@@ -90,7 +91,30 @@ export const authConfig = {
     },
   },
   plugins: [
-    username(),
+    username({
+      minUsernameLength: 5, // Must be more than 4 characters
+      maxUsernameLength: 30,
+      usernameValidator: (username) => {
+        const lowerUsername = username.toLowerCase();
+
+        // Allow admin username specified in environment variable
+        if (env.ADMIN_USERNAME && lowerUsername === env.ADMIN_USERNAME.toLowerCase()) {
+          return true;
+        }
+
+        // Check against reserved usernames list
+        if (reservedUsernames.indexOf(lowerUsername) !== -1) {
+          return false;
+        }
+
+        // Character set validation: only letters, numbers, underscores, and hyphens
+        return /^[a-zA-Z0-9_-]+$/.test(username);
+      },
+      displayUsernameValidator: (displayUsername) => {
+        // Display name uses the same character set restrictions
+        return /^[a-zA-Z0-9_-]+$/.test(displayUsername);
+      },
+    }),
     admin(),
     apiKey({
       enableSessionForAPIKeys: true,

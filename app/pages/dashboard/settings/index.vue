@@ -17,10 +17,10 @@ const profileSchema = z.object({
   name: z.string().min(2, "Too short"),
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
+    .min(5, "Username must be at least 5 characters")
     .regex(
       /^[a-zA-Z0-9_-]+$/,
-      "Username can only contain letters, numbers, hyphens and underscores",
+      "Username can only contain letters, numbers, underscores, and hyphens",
     )
     .optional(),
   email: z.string().email("Invalid email"),
