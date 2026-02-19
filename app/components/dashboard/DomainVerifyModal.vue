@@ -97,35 +97,41 @@ async function verifyDomain() {
 
     <template #body>
       <div class="space-y-4">
-        <div v-if="domain" class="bg-muted/50 rounded-lg p-4 space-y-3">
-          <p class="text-sm font-medium">DNS TXT Record Configuration</p>
-          <p class="text-sm text-muted-foreground">
-            Add the following TXT record to your domain's DNS configuration:
-          </p>
-
-          <div class="flex items-start gap-3">
-            <span class="text-sm font-medium min-w-16">Type:</span>
-            <UBadge variant="subtle">TXT</UBadge>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="text-sm font-medium min-w-16">Name:</span>
-            <span class="text-sm font-mono">@</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="text-sm font-medium min-w-16">Value:</span>
-            <div class="flex items-center gap-2 flex-1">
-              <span class="text-sm font-mono break-all">
-                {{ domain.verificationToken }}
-              </span>
-              <UButton
-                variant="ghost"
-                size="xs"
-                icon="i-lucide-copy"
-                @click="copyToken(domain.verificationToken || '')"
-              />
+        <UAlert
+          v-if="domain"
+          color="neutral"
+          icon="i-lucide-info"
+          title="DNS TXT Record Configuration"
+          description="Add the following TXT record to your domain's DNS configuration:"
+        >
+          <template #body>
+            <div class="mt-4 space-y-3">
+              <div class="flex items-start gap-3">
+                <span class="text-sm font-medium min-w-16">Type:</span>
+                <UBadge variant="subtle">TXT</UBadge>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-sm font-medium min-w-16">Host/Name:</span>
+                <span class="text-sm font-mono">@</span>
+                <span class="text-xs text-muted-foreground">(or {{ domain.domainName }})</span>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-sm font-medium min-w-16">Value:</span>
+                <div class="flex items-center gap-2 flex-1">
+                  <span class="text-sm font-mono break-all">
+                    {{ domain.verificationToken }}
+                  </span>
+                  <UButton
+                    variant="ghost"
+                    size="xs"
+                    icon="i-lucide-copy"
+                    @click="copyToken(domain.verificationToken || '')"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </UAlert>
 
         <div class="flex justify-end gap-2">
           <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>

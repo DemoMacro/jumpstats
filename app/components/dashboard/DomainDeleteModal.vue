@@ -80,17 +80,18 @@ async function deleteDomain() {
 
     <template #body>
       <div class="space-y-4">
-        <div v-if="domain" class="bg-muted/50 rounded-lg p-4 space-y-2">
-          <p class="text-sm font-medium">⚠️ Warning</p>
-          <p class="text-sm text-muted-foreground">You are about to delete the domain:</p>
-          <p class="font-mono text-sm font-semibold text-center">
-            {{ domain.domainName }}
-          </p>
-          <p class="text-xs text-muted-foreground">
-            This action cannot be undone. All links associated with this domain will need to be
-            reassigned before deletion.
-          </p>
-        </div>
+        <UAlert v-if="domain" color="error" icon="i-lucide-alert-triangle" title="Warning">
+          <template #description>
+            <div class="space-y-1">
+              <p>You are about to delete the domain:</p>
+              <p class="font-mono text-sm font-semibold">{{ domain.domainName }}</p>
+              <p class="text-xs">
+                This action cannot be undone. All links associated with this domain will need to be
+                reassigned before deletion.
+              </p>
+            </div>
+          </template>
+        </UAlert>
 
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="deleteDomain">
           <UFormField

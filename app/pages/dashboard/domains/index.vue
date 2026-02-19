@@ -3,6 +3,7 @@ import type { TableColumn } from "@nuxt/ui";
 import type { Domain } from "~~/shared/types/domain";
 import { getPaginationRowModel } from "@tanstack/table-core";
 import { authClient } from "~/utils/auth";
+import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
@@ -42,37 +43,30 @@ async function copyToClipboard(token: string) {
   }
 }
 
-// Fetch data using useAsyncData with SSR support and automatic caching
+// Build query based on pagination and active organization
+const query = computed(() => {
+  const q: Record<string, any> = {
+    limit: pagination.value.pageSize,
+    offset: pagination.value.pageIndex * pagination.value.pageSize,
+  };
+  if (activeOrg.value?.id) {
+    q.organizationId = activeOrg.value.id;
+  }
+  return q;
+});
+
+// Fetch domains using composable with watch sources
 const {
-  data: domainsData,
-  pending: loading,
+  domains,
+  total,
+  loading,
   refresh: fetchDomains,
   error,
-} = await useAsyncData(
-  "domains",
-  async () => {
-    // Build query based on active organization
-    const query: Record<string, any> = {};
-    if (activeOrg.value?.id) {
-      query.organizationId = activeOrg.value.id;
-    }
-
-    const result = await authClient.domain.list({
-      query,
-    });
-    return result.data;
-  },
-  {
-    transform: (data) => ({
-      domains: data?.domains ?? [],
-      total: data?.total ?? 0,
-    }),
-    watch: [activeOrg], // Re-fetch when active organization changes
-  },
-);
-
-const domains = computed(() => domainsData.value?.domains ?? []);
-const total = computed(() => domainsData.value?.total ?? 0);
+} = useDomains(query.value, [
+  activeOrg,
+  () => pagination.value.pageIndex,
+  () => pagination.value.pageSize,
+]);
 
 // Watch for errors and display toast notification
 watch(error, (newError) => {
@@ -224,8 +218,11 @@ const columns: TableColumn<Domain>[] = [
                           <UBadge variant="subtle">TXT</UBadge>
                         </div>
                         <div class="flex items-center gap-2">
-                          <span class="text-sm font-medium">Name:</span>
+                          <span class="text-sm font-medium">Host/Name:</span>
                           <span class="text-sm font-mono">@</span>
+                          <span class="text-xs text-muted-foreground"
+                            >(or {{ row.original.domainName }})</span
+                          >
                         </div>
                         <div class="flex items-center gap-2">
                           <span class="text-sm font-medium">Value:</span>
@@ -252,7 +249,6 @@ const columns: TableColumn<Domain>[] = [
                     icon="i-lucide-trash"
                     color="error"
                     title="Delete Domain"
-                    :disabled="row.original.status === 'active'"
                   />
                 </DashboardDomainDeleteModal>
               </div>

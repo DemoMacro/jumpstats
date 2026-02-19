@@ -1,8 +1,22 @@
 export default defineNuxtRouteMiddleware(async (to) => {
+  if (import.meta.server) {
+    return;
+  }
+
   const toast = useToast();
 
   // Check if user is authenticated for all routes
-  const { data: session } = await authClient.useSession(useFetch);
+  const { data: session, isPending } = await authClient.useSession(useFetch);
+
+  // If session is still loading, wait for it to complete
+  if (isPending) {
+    let attempts = 0;
+    const maxAttempts = 10;
+    while (isPending && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      attempts++;
+    }
+  }
 
   // If user is authenticated and trying to access auth pages, redirect to dashboard
   if (session.value?.user && to.path.startsWith("/auth/")) {

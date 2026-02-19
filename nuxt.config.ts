@@ -2,6 +2,10 @@ import { defineNuxtConfig } from "nuxt/config";
 import { isDevelopment, env } from "std-env";
 
 export default defineNuxtConfig({
+  app: {
+    keepalive: true,
+  },
+
   future: {
     compatibilityVersion: 5,
   },
@@ -17,6 +21,12 @@ export default defineNuxtConfig({
       cors: true,
     },
     "/sw.js": {
+      ssr: false,
+    },
+    "/admin/**": {
+      ssr: false,
+    },
+    "/dashboard/**": {
       ssr: false,
     },
   },
