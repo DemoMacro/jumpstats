@@ -12,7 +12,7 @@ import { isDevelopment, env } from "std-env";
  */
 
 // Cache storage with global namespace prefix
-// Keys will be stored as: JS.GS:cache:link:domain:shortCode
+// Keys will be stored as: jsgs:cache:link:domain:shortCode
 export const cacheStorage = prefixStorage(
   createStorage({
     driver: isDevelopment
@@ -25,5 +25,5 @@ export const cacheStorage = prefixStorage(
           })
         : memoryDriver(),
   }),
-  "JS.GS:cache",
+  "jsgs:cache",
 );

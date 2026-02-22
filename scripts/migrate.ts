@@ -73,12 +73,8 @@ export async function migrate() {
     console.log("✅ ClickHouse connection initialized successfully");
 
     await chdbClient.command({
-      query: `CREATE DATABASE IF NOT EXISTS JS.GS`,
-    });
-
-    await chdbClient.command({
       query: `
-        CREATE TABLE IF NOT EXISTS JS.GS.clickEvents
+        CREATE TABLE IF NOT EXISTS \`${chdbConfig.database}\`.clickEvents
         (
           -- Primary keys
           id String,
