@@ -60,7 +60,7 @@ export const updateDomain = () => {
         // If domain name is changed, reset verification
         updateData.domainName = domainName;
         updateData.status = "pending";
-        updateData.verificationToken = `jumpstats-verify-${generateVerificationToken()}`;
+        updateData.verificationToken = `JS.GS-verify-${generateVerificationToken()}`;
         updateData.verifiedAt = null;
       }
 

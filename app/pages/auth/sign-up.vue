@@ -6,7 +6,7 @@ import { authClient } from "~/utils/auth";
 const toast = useToast();
 
 definePageMeta({
-  title: "Sign Up - JumpStats",
+  title: "Sign Up - JS.GS",
 });
 
 const fields: AuthFormField[] = [

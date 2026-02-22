@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: "Organization Security - Dashboard - JumpStats",
+  title: "Organization Security - Dashboard - JS.GS",
 });
 
 const toast = useToast();

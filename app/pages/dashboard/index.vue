@@ -5,7 +5,7 @@ import { authClient } from "~/utils/auth";
 import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
-  title: "Dashboard - JumpStats",
+  title: "Dashboard - JS.GS",
 });
 
 const items = computed(

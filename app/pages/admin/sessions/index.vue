@@ -4,7 +4,7 @@ import { getPaginationRowModel } from "@tanstack/table-core";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Sessions - Admin - JumpStats",
+  title: "Sessions - Admin - JS.GS",
 });
 
 // Table state

@@ -5,7 +5,7 @@ import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Create User - Admin - JumpStats",
+  title: "Create User - Admin - JS.GS",
 });
 
 const toast = useToast();

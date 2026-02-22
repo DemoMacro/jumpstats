@@ -72,7 +72,7 @@ export const createDomain = () => {
       }
 
       // Generate verification token
-      const verificationToken = `jumpstats-verify-${generateVerificationToken()}`;
+      const verificationToken = `JS.GS-verify-${generateVerificationToken()}`;
 
       const newDomain = {
         domainName,

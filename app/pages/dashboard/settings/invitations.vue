@@ -4,7 +4,7 @@ import type { Invitation } from "better-auth/plugins";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Invitations - Settings - Dashboard - JumpStats",
+  title: "Invitations - Settings - Dashboard - JS.GS",
 });
 
 const toast = useToast();

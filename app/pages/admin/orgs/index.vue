@@ -6,7 +6,7 @@ import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Organizations - Admin - JumpStats",
+  title: "Organizations - Admin - JS.GS",
 });
 
 // Table state

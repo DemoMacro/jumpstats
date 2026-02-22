@@ -4,7 +4,7 @@ import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "app",
-  title: "JumpStats - Shorten Your Links",
+  title: "JS.GS - Shorten Your Links",
   description:
     "Transform long URLs into short, memorable links with powerful analytics and tracking.",
 });
@@ -227,7 +227,7 @@ async function copyToClipboard() {
           },
           {
             label: 'View on GitHub',
-            to: 'https://github.com/DemoMacro/JumpStats',
+            to: 'https://github.com/DemoMacro/JS.GS',
             target: '_blank',
             icon: 'i-simple-icons-github',
             color: 'neutral',

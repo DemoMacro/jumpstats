@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({
   layout: "app",
-  title: "Privacy Policy - JumpStats",
-  description: "Learn how JumpStats collects, uses, and protects your personal information.",
+  title: "Privacy Policy - JS.GS",
+  description: "Learn how JS.GS collects, uses, and protects your personal information.",
 });
 
 const { locale } = useI18n();

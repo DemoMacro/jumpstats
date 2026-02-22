@@ -3,7 +3,7 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Organization - Dashboard - JumpStats",
+  title: "Organization - Dashboard - JS.GS",
 });
 
 // Get active organization

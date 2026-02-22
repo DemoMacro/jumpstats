@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: "dashboard",
-  title: "Links - JumpStats",
+  title: "Links - JS.GS",
 });
 </script>
 

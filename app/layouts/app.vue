@@ -32,9 +32,7 @@ const items = computed<NavigationMenuItem[]>(() => {
   <UApp>
     <UHeader>
       <template #title>
-        <NuxtLink to="/" class="flex items-center gap-1.5 font-semibold text-lg">
-          JumpStats
-        </NuxtLink>
+        <NuxtLink to="/" class="flex items-center gap-1.5 font-semibold text-lg"> JS.GS </NuxtLink>
       </template>
 
       <UNavigationMenu :items="items" />
@@ -65,7 +63,7 @@ const items = computed<NavigationMenuItem[]>(() => {
 
     <UFooter>
       <template #left>
-        <p class="text-sm text-muted-foreground">JumpStats • {{ new Date().getFullYear() }}</p>
+        <p class="text-sm text-muted-foreground">JS.GS • {{ new Date().getFullYear() }}</p>
       </template>
 
       <UNavigationMenu
@@ -78,7 +76,7 @@ const items = computed<NavigationMenuItem[]>(() => {
 
       <template #right>
         <UButton
-          to="https://github.com/DemoMacro/JumpStats"
+          to="https://github.com/DemoMacro/JS.GS"
           target="_blank"
           icon="i-simple-icons-github"
           aria-label="GitHub"

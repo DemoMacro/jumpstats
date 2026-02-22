@@ -7,7 +7,7 @@ import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Domains - Dashboard - JumpStats",
+  title: "Domains - Dashboard - JS.GS",
 });
 
 const table = useTemplateRef("table");

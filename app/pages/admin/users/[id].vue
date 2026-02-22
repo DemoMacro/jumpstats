@@ -3,7 +3,7 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
   layout: "dashboard",
-  title: "User Details - Admin - JumpStats",
+  title: "User Details - Admin - JS.GS",
 });
 
 const route = useRoute();

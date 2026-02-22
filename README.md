@@ -1,6 +1,6 @@
-# JumpStats
+# JS.GS
 
-![GitHub](https://img.shields.io/github/license/DemoMacro/JumpStats)
+![GitHub](https://img.shields.io/github/license/DemoMacro/JS.GS)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)
 
 > Modern URL shortener with powerful analytics - Track clicks, analyze geolocation, monitor devices, and gain insights from your shortened links.
@@ -63,17 +63,17 @@ bun run preview
 
 ```bash
 # Build Docker image
-docker build -t jumpstats .
+docker build -t JS.GS .
 
 # Run container
 docker run -p 3000:3000 \
   --env-file .env \
-  jumpstats
+  JS.GS
 ```
 
 ## Support & Community
 
-- 📫 [Report Issues](https://github.com/DemoMacro/JumpStats/issues)
+- 📫 [Report Issues](https://github.com/DemoMacro/JS.GS/issues)
 
 ## License
 

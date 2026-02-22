@@ -1,11 +1,11 @@
 {
-  "name": "jumpstats-server",
+  "name": "js.gs-server",
   "version": "0.0.0",
   "private": true,
   "description": "",
-  "homepage": "https://github.com/DemoMacro/JumpStats#readme",
+  "homepage": "https://github.com/DemoMacro/JS.GS#readme",
   "bugs": {
-    "url": "https://github.com/DemoMacro/JumpStats/issues"
+    "url": "https://github.com/DemoMacro/JS.GS/issues"
   },
   "license": "MIT",
   "author": {
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DemoMacro/JumpStats.git"
+    "url": "git+https://github.com/DemoMacro/JS.GS.git"
   },
   "scripts": {
     "build": "nuxt build",
@@ -49,6 +49,7 @@
     "isbot": "5.1.35",
     "kysely": "0.28.11",
     "nuxt": "4.3.1",
+    "openapi-renderer": "0.1.1",
     "oxfmt": "0.33.0",
     "oxlint": "1.48.0",
     "oxlint-tsgolint": "0.14.0",

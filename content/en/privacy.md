@@ -1,12 +1,12 @@
 ---
 title: Privacy Policy
-description: Privacy Policy for JumpStats
+description: Privacy Policy for JS.GS
 date: 2026-02-15
 ---
 
 ## Our Commitment
 
-At JumpStats, we take your privacy seriously and are committed to protecting your personal information. This policy explains how we collect, use, store, and safeguard your data when you use our URL shortening service.
+At JS.GS, we take your privacy seriously and are committed to protecting your personal information. This policy explains how we collect, use, store, and safeguard your data when you use our URL shortening service.
 
 ## Information We Collect
 
@@ -122,7 +122,7 @@ Your short links redirect to websites and content that we do not control. We are
 
 ## Children's Privacy
 
-JumpStats is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If we discover that we have inadvertently collected such information, we will delete it promptly. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+JS.GS is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If we discover that we have inadvertently collected such information, we will delete it promptly. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
 
 ## International Data Transfers
 

@@ -122,7 +122,9 @@ export const authConfig = {
       fallbackToDatabase: true,
     }),
     organization(),
-    openAPI(),
+    openAPI({
+      disableDefaultReference: true,
+    }),
     domain(),
     link(),
   ],

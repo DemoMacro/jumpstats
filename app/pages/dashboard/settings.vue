@@ -3,7 +3,7 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Settings - Dashboard - JumpStats",
+  title: "Settings - Dashboard - JS.GS",
 });
 
 // Navigation items

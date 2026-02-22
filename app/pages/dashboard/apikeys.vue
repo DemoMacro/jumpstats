@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: "dashboard",
-  title: "API Keys - JumpStats",
+  title: "API Keys - JS.GS",
 });
 </script>
 

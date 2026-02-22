@@ -6,7 +6,7 @@ import { authClient } from "~/utils/auth";
 const toast = useToast();
 
 definePageMeta({
-  title: "Verify Email - JumpStats",
+  title: "Verify Email - JS.GS",
 });
 
 const schema = z.object({

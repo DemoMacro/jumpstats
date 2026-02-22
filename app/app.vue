@@ -11,7 +11,7 @@ const lang = computed(() => locales[locale.value].code);
 const dir = computed(() => locales[locale.value].dir);
 
 useHead({
-  titleTemplate: (title) => (title ? `${title} - JumpStats` : "JumpStats"),
+  titleTemplate: (title) => (title ? `${title} - JS.GS` : "JS.GS"),
   meta: [
     { charset: "utf-8" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 definePageMeta({
   layout: "app",
-  title: "Terms of Service - JumpStats",
+  title: "Terms of Service - JS.GS",
   description:
-    "Read our Terms of Service to understand your rights and responsibilities when using JumpStats.",
+    "Read our Terms of Service to understand your rights and responsibilities when using JS.GS.",
 });
 
 const { locale } = useI18n();

@@ -8,7 +8,7 @@ const loading = ref(false);
 const emailSent = ref(false);
 
 definePageMeta({
-  title: "Forgot Password - JumpStats",
+  title: "Forgot Password - JS.GS",
 });
 
 const fields: AuthFormField[] = [

@@ -4,7 +4,7 @@ import { useDomains } from "~/composables/useDomains";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Link Details - Dashboard - JumpStats",
+  title: "Link Details - Dashboard - JS.GS",
 });
 
 const route = useRoute();

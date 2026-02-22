@@ -14,10 +14,10 @@ export async function sendEmailVerification({
   try {
     const resend = new Resend(env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
-      from: env.RESEND_FROM_EMAIL || "JumpStats <noreply@js.gs>",
+      from: env.RESEND_FROM_EMAIL || "JS.GS <noreply@js.gs>",
       to: user.email,
-      subject: "Verify your JumpStats email address",
-      text: `Please click the following link to verify your email address:\n\n${url}\n\nIf you did not register for a JumpStats account, please ignore this email.\nThis link will expire in 1 hour.`,
+      subject: "Verify your JS.GS email address",
+      text: `Please click the following link to verify your email address:\n\n${url}\n\nIf you did not register for a JS.GS account, please ignore this email.\nThis link will expire in 1 hour.`,
     });
 
     if (error) {

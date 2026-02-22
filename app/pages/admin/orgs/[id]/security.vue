@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: "Organization Security - Admin - JumpStats",
+  title: "Organization Security - Admin - JS.GS",
 });
 
 const route = useRoute();

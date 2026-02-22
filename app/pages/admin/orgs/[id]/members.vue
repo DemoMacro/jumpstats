@@ -2,7 +2,7 @@
 import type { Organization } from "better-auth/plugins";
 
 definePageMeta({
-  title: "Organization Members - Admin - JumpStats",
+  title: "Organization Members - Admin - JS.GS",
 });
 
 const toast = useToast();

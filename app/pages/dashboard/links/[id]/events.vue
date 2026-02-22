@@ -7,7 +7,7 @@ import { authClient } from "~/utils/auth";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Events - Link Details - Dashboard - JumpStats",
+  title: "Events - Link Details - Dashboard - JS.GS",
 });
 
 const route = useRoute();

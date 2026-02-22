@@ -2,7 +2,7 @@
 import type { DropdownMenuItem } from "@nuxt/ui";
 
 definePageMeta({
-  title: "Admin - JumpStats",
+  title: "Admin - JS.GS",
 });
 
 interface Stat {

@@ -1,6 +1,6 @@
 export const apps = [
   {
-    name: "jumpstats",
+    name: "JS.GS",
     script: "bun",
     args: ".output/server/index.mjs",
   },

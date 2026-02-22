@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  title: "Security Settings - Dashboard - JumpStats",
+  title: "Security Settings - Dashboard - JS.GS",
 });
 
 const toast = useToast();

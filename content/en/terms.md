@@ -1,22 +1,22 @@
 ---
 title: Terms of Service
-description: Terms of Service for JumpStats
+description: Terms of Service for JS.GS
 date: 2026-02-15
 ---
 
-## Welcome to JumpStats
+## Welcome to JS.GS
 
-Thank you for choosing JumpStats. These terms of service govern your use of our URL shortening platform, which allows you to create short, memorable links with comprehensive analytics and custom domain support. By accessing or using JumpStats, you agree to be bound by these terms.
+Thank you for choosing JS.GS. These terms of service govern your use of our URL shortening platform, which allows you to create short, memorable links with comprehensive analytics and custom domain support. By accessing or using JS.GS, you agree to be bound by these terms.
 
 ## Service Description
 
-JumpStats provides a URL shortening service that transforms long web addresses into concise, shareable links. Our platform includes features for tracking click analytics, understanding audience demographics, managing links through an intuitive dashboard, and using custom domains when available in your plan. The service is built on modern web technologies including data storage, analytics databases, and caching services for performance.
+JS.GS provides a URL shortening service that transforms long web addresses into concise, shareable links. Our platform includes features for tracking click analytics, understanding audience demographics, managing links through an intuitive dashboard, and using custom domains when available in your plan. The service is built on modern web technologies including data storage, analytics databases, and caching services for performance.
 
 ## Account Creation and Security
 
 ### Registration Requirements
 
-To use certain features of JumpStats, you must create an account and provide accurate, complete information. You are responsible for maintaining the confidentiality of your password and account credentials. You agree to notify us immediately of any unauthorized use of your account.
+To use certain features of JS.GS, you must create an account and provide accurate, complete information. You are responsible for maintaining the confidentiality of your password and account credentials. You agree to notify us immediately of any unauthorized use of your account.
 
 ### Account Security
 
@@ -30,11 +30,11 @@ Our platform includes session management features that allow you to view and rev
 
 ### Permitted Use
 
-You agree to use JumpStats only for lawful purposes and in accordance with these terms. You may create links to legitimate content that you own or have the right to share. Our service is designed for personal and business use cases including social media sharing, marketing campaigns, and audience analytics.
+You agree to use JS.GS only for lawful purposes and in accordance with these terms. You may create links to legitimate content that you own or have the right to share. Our service is designed for personal and business use cases including social media sharing, marketing campaigns, and audience analytics.
 
 ### Prohibited Activities
 
-You must not use JumpStats to create links that redirect to illegal content, malware, phishing sites, or any material that violates applicable laws or regulations. The service cannot be used for spam, fraud, or deceptive practices. Creating links that violate the rights of others, including intellectual property rights, is prohibited.
+You must not use JS.GS to create links that redirect to illegal content, malware, phishing sites, or any material that violates applicable laws or regulations. The service cannot be used for spam, fraud, or deceptive practices. Creating links that violate the rights of others, including intellectual property rights, is prohibited.
 
 We reserve the right to remove any link that we believe violates these terms or is otherwise objectionable, without prior notice. We may also suspend or terminate accounts that repeatedly or seriously violate acceptable use policies.
 
@@ -64,7 +64,7 @@ We capture and analyze UTM parameters and custom query parameters from your orig
 
 ### Organization Management
 
-JumpStats supports organization features that allow groups of users to collaborate on link management. Organizations can have multiple members with different roles including owner, administrator, and regular member. Role-based permissions determine what actions each member can perform within the organization.
+JS.GS supports organization features that allow groups of users to collaborate on link management. Organizations can have multiple members with different roles including owner, administrator, and regular member. Role-based permissions determine what actions each member can perform within the organization.
 
 ### Organization Responsibilities
 
@@ -98,7 +98,7 @@ During high traffic periods or technical issues, redirect speeds may be slower t
 
 ### Service Ownership
 
-JumpStats, including all software, databases, trademarks, and content, is owned by us or our licensors and is protected by intellectual property laws. You may not copy, modify, or create derivative works of our service without explicit permission.
+JS.GS, including all software, databases, trademarks, and content, is owned by us or our licensors and is protected by intellectual property laws. You may not copy, modify, or create derivative works of our service without explicit permission.
 
 ### Your Content
 
@@ -122,7 +122,7 @@ Upon account termination, your right to use the service ceases immediately. We m
 
 ### Service Provision
 
-JumpStats is provided on an "as is" and "as available" basis without warranties of any kind, whether express or implied. We do not guarantee that the service will be uninterrupted, secure, or error-free.
+JS.GS is provided on an "as is" and "as available" basis without warranties of any kind, whether express or implied. We do not guarantee that the service will be uninterrupted, secure, or error-free.
 
 ### Damages Exclusion
 
@@ -138,7 +138,7 @@ While we strive for accurate analytics, we cannot guarantee complete precision d
 
 ## Indemnification
 
-You agree to indemnify and hold harmless JumpStats, its owners, operators, and affiliates from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from your use of the service, your violation of these terms, or your violation of any third-party rights.
+You agree to indemnify and hold harmless JS.GS, its owners, operators, and affiliates from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from your use of the service, your violation of these terms, or your violation of any third-party rights.
 
 ## Modifications to Terms and Service
 
@@ -158,17 +158,17 @@ Your continued use of the service after changes to these terms constitutes accep
 
 ### Governing Law
 
-These terms are governed by the laws of the jurisdiction where JumpStats is operated. Any disputes arising from these terms or your use of the service will be resolved in accordance with applicable law.
+These terms are governed by the laws of the jurisdiction where JS.GS is operated. Any disputes arising from these terms or your use of the service will be resolved in accordance with applicable law.
 
 ### Arbitration
 
-To the extent permitted by law, any disputes between you and JumpStats will be resolved through binding arbitration rather than in court, except that you may assert claims in small claims court if your claims qualify.
+To the extent permitted by law, any disputes between you and JS.GS will be resolved through binding arbitration rather than in court, except that you may assert claims in small claims court if your claims qualify.
 
 ## General Provisions
 
 ### Entire Agreement
 
-These terms constitute the entire agreement between you and JumpStats regarding your use of the service, superseding any prior agreements or communications.
+These terms constitute the entire agreement between you and JS.GS regarding your use of the service, superseding any prior agreements or communications.
 
 ### Severability
 

@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 
 definePageMeta({
   layout: "dashboard",
-  title: "Create Organization - Dashboard - JumpStats",
+  title: "Create Organization - Dashboard - JS.GS",
 });
 
 const toast = useToast();
