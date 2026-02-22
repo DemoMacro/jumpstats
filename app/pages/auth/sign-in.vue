@@ -124,14 +124,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           <ULink to="/auth/sign-up" class="text-primary font-medium"> Sign up </ULink>.
         </template>
 
-        <template #password-hint>
-          <div class="flex justify-between w-full">
-            <ULink to="/auth/forgot-password" class="text-primary font-medium">
-              Forgot password?
-            </ULink>
-            <ULink to="/auth/verify-email" class="text-primary font-medium">
-              Resend verification
-            </ULink>
+        <template #footer>
+          <div class="flex flex-col gap-2 mt-4">
+            <div class="flex justify-between items-center text-sm">
+              <ULink to="/auth/forgot-password" class="text-primary"> Forgot password? </ULink>
+              <ULink to="/auth/verify-email" class="text-primary">
+                Resend verification email
+              </ULink>
+            </div>
           </div>
         </template>
 
